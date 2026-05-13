@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SiteForge Host - Sign in</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: { 950: '#0a0a0b', 900: '#111114', 800: '#17171c', 700: '#1f1f26', 600: '#2a2a33' },
+            accent: { DEFAULT: '#7c5cff', soft: '#5b46d6' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  </style>
+</head>
+<body class="bg-ink-950 text-zinc-100 min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+    <div class="flex items-center gap-3 mb-8 justify-center">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-accent-soft grid place-items-center font-bold">SF</div>
+      <div>
+        <div class="text-lg font-semibold leading-none">SiteForge Host</div>
+        <div class="text-xs text-zinc-400 mt-1">Self-hosted static site dashboard</div>
+      </div>
+    </div>
+
+    <form id="loginForm" class="bg-ink-900 border border-ink-700 rounded-2xl p-6 shadow-xl space-y-4">
+      <div>
+        <label class="block text-xs uppercase tracking-wider text-zinc-400 mb-2" for="username">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username" required
+          class="w-full bg-ink-800 border border-ink-600 rounded-lg px-3 py-2 outline-none focus:border-accent placeholder:text-zinc-500" />
+      </div>
+      <div>
+        <label class="block text-xs uppercase tracking-wider text-zinc-400 mb-2" for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required
+          class="w-full bg-ink-800 border border-ink-600 rounded-lg px-3 py-2 outline-none focus:border-accent placeholder:text-zinc-500" />
+      </div>
+      <div id="err" class="hidden text-sm text-rose-400"></div>
+      <button id="submit" type="submit"
+        class="w-full bg-accent hover:bg-accent-soft transition rounded-lg py-2 font-medium disabled:opacity-50">
+        Sign in
+      </button>
+    </form>
+
+    <p class="text-xs text-zinc-500 mt-6 text-center">Only the configured admin user can sign in.</p>
+  </div>
+
+  <script src="/static/login.js"></script>
+</body>
+</html>
