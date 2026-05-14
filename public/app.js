@@ -40,6 +40,13 @@ function fmtDate(iso) {
 
 function siteCard(s) {
   const stopped = s.status !== 'active';
+  const domainRow = s.domain
+    ? `<dt>Domain</dt><dd class="text-zinc-300 text-right truncate">
+         <a href="http://${escapeHtml(s.domain)}/" target="_blank" rel="noopener"
+            class="text-accent hover:underline">${escapeHtml(s.domain)}</a>
+       </dd>`
+    : `<dt>Domain</dt><dd class="text-zinc-500 text-right italic">none</dd>`;
+
   return `
     <article class="bg-ink-900 border border-ink-700 rounded-2xl p-4 flex flex-col gap-3" data-id="${s.id}">
       <div class="flex items-start justify-between gap-3">
@@ -53,6 +60,7 @@ function siteCard(s) {
         </span>
       </div>
       <dl class="text-xs text-zinc-400 grid grid-cols-2 gap-y-1">
+        ${domainRow}
         <dt>Files</dt><dd class="text-zinc-300 text-right">${s.fileCount ?? '-'}</dd>
         <dt>Last deployed</dt><dd class="text-zinc-300 text-right">${fmtDate(s.lastDeployed)}</dd>
       </dl>
@@ -62,6 +70,7 @@ function siteCard(s) {
           : `<button data-action="stop" class="text-xs px-2 py-1 rounded bg-ink-700 hover:bg-ink-600">Stop</button>`}
         <button data-action="restart" class="text-xs px-2 py-1 rounded bg-ink-700 hover:bg-ink-600">Restart</button>
         <button data-action="redeploy" class="text-xs px-2 py-1 rounded bg-ink-700 hover:bg-ink-600">Redeploy</button>
+        <button data-action="edit" class="text-xs px-2 py-1 rounded bg-ink-700 hover:bg-ink-600">Edit</button>
         <button data-action="files" class="text-xs px-2 py-1 rounded bg-ink-700 hover:bg-ink-600">Files</button>
         <button data-action="delete" class="text-xs px-2 py-1 rounded bg-rose-800 hover:bg-rose-700 ml-auto">Delete</button>
       </div>
@@ -110,6 +119,8 @@ document.addEventListener('click', async (e) => {
       loadSites();
     } else if (action === 'redeploy') {
       openDeployModal({ redeployId: id });
+    } else if (action === 'edit') {
+      openEditModal(id);
     } else if (action === 'files') {
       openFilesModal(id);
     }
@@ -148,6 +159,8 @@ function openDeployModal({ redeployId: rid = null } = {}) {
     newFields.classList.remove('hidden');
     $('#siteName').value = '';
     $('#siteSlug').value = '';
+    $('#siteDomain').value = '';
+    delete $('#siteSlug').dataset.touched;
   }
   deployModal.classList.remove('hidden');
   deployModal.classList.add('flex');
@@ -221,8 +234,10 @@ deployForm.addEventListener('submit', async (e) => {
       deployErr.classList.remove('hidden');
       return;
     }
+    const domain = $('#siteDomain').value.trim();
     fd.append('name', name);
     fd.append('slug', slug);
+    if (domain) fd.append('domain', domain);
     url = '/api/sites';
   }
 
@@ -241,6 +256,66 @@ deployForm.addEventListener('submit', async (e) => {
     dropLabel.textContent = pendingFile.name;
   } finally {
     deploySubmit.disabled = false;
+  }
+});
+
+// ─── edit settings modal ────────────────────────────────────────────────────
+
+const editModal = $('#editModal');
+const editForm = $('#editForm');
+const editName = $('#editName');
+const editDomain = $('#editDomain');
+const editErr = $('#editErr');
+const editSubmit = $('#editSubmit');
+let editingId = null;
+
+editModal.addEventListener('click', (e) => {
+  if (e.target.matches('[data-close-edit]') || e.target === editModal) closeEditModal();
+});
+
+function closeEditModal() {
+  editModal.classList.add('hidden');
+  editModal.classList.remove('flex');
+  editingId = null;
+}
+
+async function openEditModal(id) {
+  try {
+    const site = await api(`/api/sites/${id}`);
+    editingId = id;
+    editName.value = site.name || '';
+    editDomain.value = site.domain || '';
+    editErr.classList.add('hidden');
+    editErr.textContent = '';
+    editModal.classList.remove('hidden');
+    editModal.classList.add('flex');
+  } catch (err) {
+    if (err.message !== 'unauthorized') toast(err.message, 'err');
+  }
+}
+
+editForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!editingId) return;
+  editErr.classList.add('hidden');
+  editSubmit.disabled = true;
+  try {
+    await api(`/api/sites/${editingId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: editName.value.trim(),
+        domain: editDomain.value.trim(),
+      }),
+    });
+    toast('Saved', 'ok');
+    closeEditModal();
+    loadSites();
+  } catch (err) {
+    editErr.textContent = err.message;
+    editErr.classList.remove('hidden');
+  } finally {
+    editSubmit.disabled = false;
   }
 });
 

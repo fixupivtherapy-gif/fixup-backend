@@ -23,6 +23,10 @@ const SECURE_COOKIES = String(process.env.SECURE_COOKIES || '').toLowerCase() ==
 const MAX_UPLOAD_MB = parseInt(process.env.MAX_UPLOAD_MB || '500', 10);
 const SESSION_SECRET = process.env.SESSION_SECRET
   || crypto.randomBytes(48).toString('hex'); // dev fallback; sessions reset on restart
+const DASHBOARD_HOSTS = (process.env.DASHBOARD_HOSTS || 'localhost,127.0.0.1,::1')
+  .split(',')
+  .map(h => h.trim().toLowerCase())
+  .filter(Boolean);
 
 const ROOT = __dirname;
 const SITES_DIR = path.join(ROOT, 'sites');
@@ -53,6 +57,23 @@ function saveMetadata(data) {
 
 function isValidSlug(slug) {
   return typeof slug === 'string' && /^[a-z0-9][a-z0-9-]{0,62}$/.test(slug);
+}
+
+function normalizeDomain(input) {
+  if (input == null) return '';
+  return String(input)
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .replace(/\/.*$/, '')
+    .replace(/:\d+$/, '');
+}
+
+function isValidDomain(d) {
+  if (!d || typeof d !== 'string' || d.length > 253) return false;
+  const labels = d.split('.');
+  if (labels.length === 0) return false;
+  return labels.every(l => /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/.test(l));
 }
 
 function slugify(input) {
@@ -173,6 +194,32 @@ function requireAuth(req, res, next) {
 
 // ─── public: serve deployed sites ───────────────────────────────────────────
 
+// Host-based routing: if a site has claimed the incoming `Host` header,
+// serve that site from the URL root. Otherwise fall through to the
+// dashboard / path-based serving.
+app.use((req, res, next) => {
+  const rawHost = req.headers.host || '';
+  const host = rawHost.toLowerCase().split(':')[0];
+  if (!host || DASHBOARD_HOSTS.includes(host)) return next();
+
+  const meta = loadMetadata();
+  const site = meta.sites.find(s => (s.domain || '').toLowerCase() === host);
+  if (!site) return next();
+  if (site.status !== 'active') {
+    return res.status(503).send('This site is currently stopped.');
+  }
+  const dir = path.join(SITES_DIR, site.slug);
+  return express.static(dir, {
+    fallthrough: true,
+    index: ['index.html', 'index.htm'],
+    extensions: ['html'],
+  })(req, res, () => {
+    const indexFile = path.join(dir, 'index.html');
+    if (fs.existsSync(indexFile)) return res.sendFile(indexFile);
+    res.status(404).send('Not found');
+  });
+});
+
 app.use('/s/:slug', (req, res, next) => {
   const { slug } = req.params;
   if (!isValidSlug(slug)) return res.status(404).send('Not found');
@@ -286,6 +333,47 @@ app.get('/api/sites/:id', requireAuth, (req, res) => {
   });
 });
 
+app.patch('/api/sites/:id', requireAuth, json, (req, res) => {
+  const meta = loadMetadata();
+  const site = meta.sites.find(s => s.id === req.params.id);
+  if (!site) return res.status(404).json({ error: 'Site not found' });
+
+  const { name, domain } = req.body || {};
+
+  if (typeof name === 'string') {
+    site.name = name.trim() || site.slug;
+  }
+
+  if (domain !== undefined) {
+    if (domain === null || domain === '') {
+      delete site.domain;
+    } else {
+      const cleaned = normalizeDomain(domain);
+      if (!isValidDomain(cleaned)) {
+        return res.status(400).json({ error: 'Invalid domain. Example: example.com or app.example.com' });
+      }
+      if (DASHBOARD_HOSTS.includes(cleaned)) {
+        return res.status(400).json({ error: 'That hostname is reserved for the dashboard' });
+      }
+      const taken = meta.sites.some(
+        s => s.id !== site.id && (s.domain || '').toLowerCase() === cleaned
+      );
+      if (taken) return res.status(409).json({ error: 'Another site already uses that domain' });
+      site.domain = cleaned;
+    }
+  }
+
+  saveMetadata(meta);
+  res.json({
+    ok: true,
+    site: {
+      ...site,
+      fileCount: countFiles(path.join(SITES_DIR, site.slug)),
+      url: `/s/${site.slug}/`,
+    },
+  });
+});
+
 app.post('/api/sites', requireAuth, uploadZip.single('zip'), (req, res) => {
   const zipPath = req.file && req.file.path;
   try {
@@ -302,6 +390,21 @@ app.post('/api/sites', requireAuth, uploadZip.single('zip'), (req, res) => {
     const meta = loadMetadata();
     if (meta.sites.find(s => s.slug === slug)) {
       return res.status(409).json({ error: 'A site with that slug already exists' });
+    }
+
+    let domain;
+    const rawDomain = String(req.body.domain || '').trim();
+    if (rawDomain) {
+      domain = normalizeDomain(rawDomain);
+      if (!isValidDomain(domain)) {
+        return res.status(400).json({ error: 'Invalid domain. Example: example.com or app.example.com' });
+      }
+      if (DASHBOARD_HOSTS.includes(domain)) {
+        return res.status(400).json({ error: 'That hostname is reserved for the dashboard' });
+      }
+      if (meta.sites.some(s => (s.domain || '').toLowerCase() === domain)) {
+        return res.status(409).json({ error: 'Another site already uses that domain' });
+      }
     }
 
     const destDir = path.join(SITES_DIR, slug);
@@ -322,6 +425,7 @@ app.post('/api/sites', requireAuth, uploadZip.single('zip'), (req, res) => {
       createdAt: now,
       lastDeployed: now,
     };
+    if (domain) site.domain = domain;
     meta.sites.push(site);
     saveMetadata(meta);
 

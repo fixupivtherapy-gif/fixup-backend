@@ -71,6 +71,11 @@
             <span class="text-zinc-500">/</span>
           </div>
           <p class="text-xs text-zinc-500 mt-1">Lowercase letters, digits, and hyphens.</p>
+
+          <label class="block text-xs uppercase tracking-wider text-zinc-400 mt-3 mb-2">Custom domain (optional)</label>
+          <input id="siteDomain" type="text" placeholder="example.com"
+            class="w-full bg-ink-800 border border-ink-600 rounded-lg px-3 py-2 outline-none focus:border-accent" />
+          <p class="text-xs text-zinc-500 mt-1">Point this domain's DNS at this server, then it'll serve the site at the root.</p>
         </div>
 
         <div>
@@ -88,6 +93,34 @@
         <div class="flex items-center justify-end gap-2">
           <button type="button" data-close class="px-4 py-2 rounded-lg bg-ink-800 hover:bg-ink-700 text-sm">Cancel</button>
           <button id="deploySubmit" type="submit" class="px-4 py-2 rounded-lg bg-accent hover:bg-accent-soft text-sm font-medium disabled:opacity-50">Deploy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit settings modal -->
+  <div id="editModal" class="hidden fixed inset-0 modal items-center justify-center p-4 z-20">
+    <div class="bg-ink-900 border border-ink-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Site settings</h2>
+        <button data-close-edit class="text-zinc-400 hover:text-white">&times;</button>
+      </div>
+      <form id="editForm" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-zinc-400 mb-2">Display name</label>
+          <input id="editName" type="text"
+            class="w-full bg-ink-800 border border-ink-600 rounded-lg px-3 py-2 outline-none focus:border-accent" />
+        </div>
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-zinc-400 mb-2">Custom domain</label>
+          <input id="editDomain" type="text" placeholder="example.com"
+            class="w-full bg-ink-800 border border-ink-600 rounded-lg px-3 py-2 outline-none focus:border-accent" />
+          <p class="text-xs text-zinc-500 mt-1">Leave blank to remove. Make sure the domain's DNS points to this server.</p>
+        </div>
+        <div id="editErr" class="hidden text-sm text-rose-400"></div>
+        <div class="flex items-center justify-end gap-2">
+          <button type="button" data-close-edit class="px-4 py-2 rounded-lg bg-ink-800 hover:bg-ink-700 text-sm">Cancel</button>
+          <button id="editSubmit" type="submit" class="px-4 py-2 rounded-lg bg-accent hover:bg-accent-soft text-sm font-medium disabled:opacity-50">Save</button>
         </div>
       </form>
     </div>

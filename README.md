@@ -79,6 +79,56 @@ sites return HTTP 503 until restarted from the dashboard.
 The dashboard and all `/api/*` management routes require login. The deployed
 sites themselves do not — they're public, which is the whole point.
 
+## Custom domains
+
+Each site can optionally claim a domain. When a request comes in with a `Host`
+header matching that domain, SiteForge serves the site from the URL root (so
+`https://myportfolio.com/about.html` serves `sites/portfolio/about.html`).
+
+Three things have to be true for a custom domain to work:
+
+1. **DNS** — point an `A` record for your domain at this server's public IP.
+   For local testing you can fake it by editing `/etc/hosts`:
+   ```
+   127.0.0.1   myportfolio.test
+   ```
+2. **The app knows about it** — set the domain on the site in the dashboard
+   (deploy modal or the **Edit** button on each card).
+3. **The browser can reach this server on port 80/443** — usually a port-forward
+   on your router. If you only have port 3000 open, you'll need to access the
+   site as `http://myportfolio.com:3000/`.
+
+The dashboard always wins for `localhost`, `127.0.0.1`, and `::1` so you can't
+accidentally lock yourself out by claiming `localhost` as a site's domain. Set
+`DASHBOARD_HOSTS` in `.env` to add more reserved hostnames.
+
+### HTTPS via Caddy (recommended)
+
+The simplest way to add free, auto-renewing HTTPS is to put
+[Caddy](https://caddyserver.com/) in front of SiteForge. Caddy handles certs
+automatically — you don't have to touch Let's Encrypt manually.
+
+Example `Caddyfile`:
+
+```
+myportfolio.com, www.myportfolio.com, blog.myportfolio.com {
+    reverse_proxy localhost:3000
+}
+```
+
+Then:
+
+```bash
+sudo caddy run --config /etc/caddy/Caddyfile
+```
+
+Caddy listens on 80/443, fetches HTTPS certs for each domain on first request,
+and forwards traffic to SiteForge on port 3000. SiteForge sees the original
+`Host` header and serves the matching site.
+
+Tip: keep `SECURE_COOKIES=true` in `.env` once Caddy is in front, so the
+dashboard session cookie is only sent over HTTPS.
+
 ## API (for scripting deploys)
 
 All management endpoints require an authenticated session cookie. Easiest way
@@ -91,8 +141,9 @@ to script them is to first POST to `/api/login` and reuse the cookie.
 | GET    | `/api/me` | - | Returns auth status |
 | GET    | `/api/sites` | - | List all sites |
 | GET    | `/api/sites/:id` | - | Single site |
-| POST   | `/api/sites` | multipart: `zip`, `name`, `slug` | Deploy new site |
+| POST   | `/api/sites` | multipart: `zip`, `name`, `slug`, `domain` (optional) | Deploy new site |
 | POST   | `/api/sites/:id/redeploy` | multipart: `zip` | Replace existing files |
+| PATCH  | `/api/sites/:id` | `{ name?, domain? }` (JSON) | Update name and/or custom domain. Pass `domain: ""` to clear. |
 | POST   | `/api/sites/:id/stop` | - | Mark stopped (returns 503) |
 | POST   | `/api/sites/:id/start` | - | Resume serving |
 | POST   | `/api/sites/:id/restart` | - | Alias of start |
@@ -154,6 +205,7 @@ content survives container restarts.
 | `SESSION_SECRET` | random per-boot | Signs the session cookie |
 | `SECURE_COOKIES` | `false` | Set `true` behind HTTPS |
 | `MAX_UPLOAD_MB` | `500` | ZIP upload size limit |
+| `DASHBOARD_HOSTS` | `localhost,127.0.0.1,::1` | Hostnames reserved for the dashboard (never matched by custom domains) |
 
 ## Development
 
