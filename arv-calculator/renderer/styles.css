@@ -844,6 +844,31 @@ input[inputmode="numeric"] { font-family: var(--mono); }
   .chart-wrap { height: 220px; }
 }
 
+@media (max-width: 720px) {
+  html, body { overflow: auto; font-size: 14px; }
+  .app { grid-template-columns: 1fr; height: auto; min-height: 100vh; }
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    max-height: 50vh;
+  }
+  .ribbon { flex-wrap: wrap; gap: 10px; padding: 10px 14px; }
+  .ribbon__right { width: 100%; flex-wrap: wrap; gap: 10px 16px; }
+  .ribbon__metric { min-width: 0; align-items: flex-start; }
+  .ribbon__title-input { font-size: 18px; }
+  .content { gap: 1px; }
+  .panel__body { padding: 12px 14px; }
+  .field-row { flex-wrap: wrap; }
+  .field-row .field { flex: 1 1 45%; }
+  .comps-table { font-size: 11px; }
+  .comps-table td input { padding: 6px 4px; font-size: 11px; }
+  .val-range { grid-template-columns: 1fr; }
+  .val-range__cell--mid { border-top: none; border-left: 2px solid var(--accent); margin-top: 0; }
+  .val-range__cell--mid .val-range__val { font-size: 18px; }
+  .modal__card { width: 92vw; }
+  .adj-field { grid-template-columns: 1fr 110px; }
+}
+
 /* ========== SCROLLBARS ========== */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
