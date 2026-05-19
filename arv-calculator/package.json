@@ -1,0 +1,22 @@
+{
+  "name": "arv-calculator",
+  "version": "1.0.0",
+  "description": "ARV (After Repair Value) calculator for real estate investors",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --enable-logging"
+  },
+  "keywords": [
+    "real-estate",
+    "arv",
+    "investor",
+    "calculator",
+    "electron"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^32.0.0"
+  }
+}

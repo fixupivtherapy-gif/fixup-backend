@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:;" />
+  <title>ARV Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- LEFT SIDEBAR: Saved Deals -->
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <span class="sidebar__mark">◣</span>
+        <div>
+          <div class="sidebar__title">ARV TERMINAL</div>
+          <div class="sidebar__subtitle">v1.0 — Investor Tools</div>
+        </div>
+      </div>
+
+      <div class="sidebar__section">
+        <div class="sidebar__section-head">
+          <span>SAVED DEALS</span>
+          <button id="btn-new-deal" class="btn-ghost" title="New Deal (Ctrl+N)">+ NEW</button>
+        </div>
+        <div id="deal-list" class="deal-list"></div>
+      </div>
+
+      <div class="sidebar__footer">
+        <div class="kbd-row"><kbd>⌘N</kbd><span>New deal</span></div>
+        <div class="kbd-row"><kbd>⌘S</kbd><span>Save deal</span></div>
+        <div class="kbd-row"><kbd>⌘E</kbd><span>Export report</span></div>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main">
+      <!-- TOP RIBBON -->
+      <header class="ribbon">
+        <div class="ribbon__left">
+          <div class="ribbon__crumb">DEAL</div>
+          <input
+            id="deal-name"
+            class="ribbon__title-input"
+            type="text"
+            placeholder="Untitled Deal"
+            spellcheck="false"
+          />
+          <span id="deal-status" class="ribbon__status">unsaved</span>
+        </div>
+        <div class="ribbon__right">
+          <div class="ribbon__metric">
+            <span class="ribbon__metric-label">ARV (MID)</span>
+            <span id="ribbon-arv" class="ribbon__metric-value">—</span>
+          </div>
+          <div class="ribbon__metric">
+            <span class="ribbon__metric-label">70% MAX OFFER</span>
+            <span id="ribbon-mao" class="ribbon__metric-value">—</span>
+          </div>
+          <div class="ribbon__metric">
+            <span class="ribbon__metric-label">PROFIT</span>
+            <span id="ribbon-profit" class="ribbon__metric-value">—</span>
+          </div>
+          <div id="deal-quality" class="quality-pill quality-pill--neutral">
+            <span class="quality-pill__dot"></span>
+            <span class="quality-pill__label">NO DATA</span>
+          </div>
+          <button id="btn-save" class="btn-primary">SAVE</button>
+          <button id="btn-export" class="btn-ghost">EXPORT</button>
+        </div>
+      </header>
+
+      <!-- CONTENT GRID -->
+      <div class="content">
+        <!-- COLUMN 1: SUBJECT -->
+        <section class="panel">
+          <div class="panel__head">
+            <h2 class="panel__title">Subject Property</h2>
+            <span class="panel__hint">Required: living area</span>
+          </div>
+          <div class="panel__body">
+            <div class="field field--full">
+              <label>Address</label>
+              <input id="subj-address" type="text" placeholder="123 Main St, City, ST" />
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Beds</label>
+                <input id="subj-beds" type="number" min="0" step="1" placeholder="3" />
+              </div>
+              <div class="field">
+                <label>Baths</label>
+                <input id="subj-baths" type="number" min="0" step="0.5" placeholder="2" />
+              </div>
+              <div class="field">
+                <label>Year Built</label>
+                <input id="subj-year" type="number" min="1800" max="2100" step="1" placeholder="1985" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Living Area (sqft) <span class="req">*</span></label>
+                <input id="subj-sqft" type="text" inputmode="numeric" placeholder="1,500" />
+              </div>
+              <div class="field">
+                <label>Lot Size (sqft)</label>
+                <input id="subj-lot" type="text" inputmode="numeric" placeholder="6,000" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Condition</label>
+              <select id="subj-condition">
+                <option value="distressed">Distressed</option>
+                <option value="fair">Fair</option>
+                <option value="good" selected>Good</option>
+                <option value="renovated">Renovated</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Asking / Purchase Price</label>
+                <input id="subj-price" type="text" inputmode="numeric" placeholder="$150,000" />
+              </div>
+              <div class="field">
+                <label>Estimated Rehab</label>
+                <input id="subj-rehab" type="text" inputmode="numeric" placeholder="$35,000" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Closing / Holding %</label>
+                <input id="subj-closing" type="number" min="0" max="50" step="0.5" value="10" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- COLUMN 2: COMPS -->
+        <section class="panel panel--comps">
+          <div class="panel__head">
+            <h2 class="panel__title">Comparable Sales</h2>
+            <button id="btn-add-comp" class="btn-link">+ ADD COMP</button>
+          </div>
+          <div class="comps-table-wrap">
+            <table class="comps-table">
+              <thead>
+                <tr>
+                  <th class="col-inc"></th>
+                  <th>Address</th>
+                  <th class="num">Sale Price</th>
+                  <th class="num">Date</th>
+                  <th class="num">Bd</th>
+                  <th class="num">Ba</th>
+                  <th class="num">SqFt</th>
+                  <th class="num">$/SqFt</th>
+                  <th class="num">Adj</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="comp-rows"></tbody>
+            </table>
+            <div id="comp-empty" class="comp-empty">
+              No comps yet. Click <strong>+ ADD COMP</strong> to begin.
+            </div>
+          </div>
+        </section>
+
+        <!-- COLUMN 3: VALUATION -->
+        <section class="panel panel--val">
+          <div class="panel__head">
+            <h2 class="panel__title">Valuation</h2>
+            <span class="panel__hint" id="comp-count-hint">0 comps included</span>
+          </div>
+          <div class="panel__body val-body">
+            <div class="val-method">
+              <div class="val-method__head">
+                <span class="val-method__label">M1 · Avg $/sqft</span>
+                <span id="val-m1-rate" class="val-method__rate mono">—</span>
+              </div>
+              <div id="val-m1" class="val-method__value mono">—</div>
+            </div>
+            <div class="val-method">
+              <div class="val-method__head">
+                <span class="val-method__label">M2 · Weighted (recency + size)</span>
+                <span id="val-m2-rate" class="val-method__rate mono">—</span>
+              </div>
+              <div id="val-m2" class="val-method__value mono">—</div>
+            </div>
+            <div class="val-method">
+              <div class="val-method__head">
+                <span class="val-method__label">M3 · Adjusted Comps</span>
+                <span id="val-m3-rate" class="val-method__rate mono">—</span>
+              </div>
+              <div id="val-m3" class="val-method__value mono">—</div>
+            </div>
+
+            <div class="val-range">
+              <div class="val-range__cell">
+                <span class="val-range__label">LOW</span>
+                <span id="val-low" class="val-range__val mono">—</span>
+              </div>
+              <div class="val-range__cell val-range__cell--mid">
+                <span class="val-range__label">MID · RECOMMENDED</span>
+                <span id="val-mid" class="val-range__val mono">—</span>
+              </div>
+              <div class="val-range__cell">
+                <span class="val-range__label">HIGH</span>
+                <span id="val-high" class="val-range__val mono">—</span>
+              </div>
+            </div>
+
+            <div class="investor-math">
+              <h3 class="investor-math__title">Investor Math</h3>
+              <div class="im-row">
+                <span class="im-row__label">70% Rule Max Offer</span>
+                <span id="im-mao70" class="im-row__val mono">—</span>
+              </div>
+              <div class="im-row">
+                <span class="im-row__label">75% Rule Max Offer</span>
+                <span id="im-mao75" class="im-row__val mono">—</span>
+              </div>
+              <div class="im-row im-row--sep">
+                <span class="im-row__label">Estimated Profit @ Asking</span>
+                <span id="im-profit" class="im-row__val mono">—</span>
+              </div>
+              <div class="im-row">
+                <span class="im-row__label">ROI</span>
+                <span id="im-roi" class="im-row__val mono">—</span>
+              </div>
+              <div class="im-row">
+                <span class="im-row__label">Total Investment</span>
+                <span id="im-cash" class="im-row__val mono">—</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- BOTTOM: CHARTS -->
+      <section class="charts">
+        <div class="panel panel--chart">
+          <div class="panel__head">
+            <h2 class="panel__title">$/SqFt vs Living Area</h2>
+            <span class="panel__hint">▲ subject · ● comp · ◇ outlier</span>
+          </div>
+          <div class="chart-wrap"><canvas id="chart-scatter"></canvas></div>
+        </div>
+        <div class="panel panel--chart">
+          <div class="panel__head">
+            <h2 class="panel__title">Comp Sale Prices</h2>
+            <span class="panel__hint" id="outlier-hint">—</span>
+          </div>
+          <div class="chart-wrap"><canvas id="chart-bar"></canvas></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Comp adjustment modal -->
+  <div id="adj-modal" class="modal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__card">
+      <div class="modal__head">
+        <h3 id="adj-modal-title">Adjustments</h3>
+        <button class="btn-ghost" data-close>✕</button>
+      </div>
+      <div class="modal__body">
+        <p class="modal__hint">Enter dollar +/- adjustments for differences vs. the subject property.</p>
+        <div id="adj-fields" class="adj-fields"></div>
+        <div class="adj-total">
+          <span>Net Adjustment</span>
+          <span id="adj-total" class="mono">$0</span>
+        </div>
+      </div>
+      <div class="modal__foot">
+        <button class="btn-ghost" data-close>CANCEL</button>
+        <button id="adj-apply" class="btn-primary">APPLY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="calculations.js"></script>
+  <script src="storage.js"></script>
+  <script src="charts.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
