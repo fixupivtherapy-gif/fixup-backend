@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>JD's Property Solutions</title>
+<meta name="description" content="Plataforma de trabajo para mayoristas e inversionistas en bienes raíces." />
+<meta name="theme-color" content="#F5F1EA" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+<style>
+:root{--bone:#F5F1EA;--paper:#FAF7F2;--ink:#1A1714;--muted:#6B6358;--muted-soft:#8F8779;--rule:#D9D2C5;--clay:#A8553D;--clay-dark:#8B4632;--clay-soft:rgba(168,85,61,.08)}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bone);color:var(--ink);font-family:'Inter Tight',system-ui,sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;mix-blend-mode:multiply;background-image:url("data:image/svg+xml;utf8,<svg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.layer{position:relative;z-index:1}
+.container{max-width:1200px;margin:0 auto;padding:0 1.25rem}
+::selection{background:var(--clay);color:var(--paper)}
+button{font-family:inherit;cursor:pointer}
+*:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:400;letter-spacing:-.015em;color:var(--ink);margin:0}
+.num,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.eyebrow{font-family:'Inter Tight',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:.6875rem;color:var(--muted);margin:0}
+.marker{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.6875rem;letter-spacing:.14em;text-transform:uppercase;color:var(--clay)}
+
+/* HEADER */
+header.site{border-bottom:1px solid var(--rule);background:rgba(245,241,234,.88);backdrop-filter:saturate(140%) blur(4px);position:sticky;top:0;z-index:20}
+.header-row{display:flex;align-items:center;justify-content:space-between;height:3.5rem}
+.wordmark{display:inline-flex;align-items:baseline;gap:.375rem;font-family:'Fraunces',Georgia,serif;font-size:1.0625rem;letter-spacing:-.01em;color:var(--ink);text-decoration:none}
+.wordmark .ap{color:var(--clay)}
+.wordmark .sub{font-family:'Inter Tight',sans-serif;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-size:.6875rem;margin-left:.25rem}
+.lang-toggle{display:inline-flex;align-items:center;font-size:.6875rem;text-transform:uppercase;letter-spacing:.14em}
+.lang-toggle button{background:none;border:0;color:var(--muted);padding:.125rem .375rem;font:inherit;text-transform:inherit;letter-spacing:inherit;transition:color .15s}
+.lang-toggle button[aria-pressed="true"]{color:var(--clay)}
+.lang-toggle button:hover:not([aria-pressed="true"]){color:var(--ink)}
+.lang-toggle .sep{color:var(--muted-soft)}
+
+/* TABS */
+nav.tabs{border-bottom:1px solid var(--rule);background:rgba(250,247,242,.5)}
+.tabs-row{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-btn{flex:1;min-width:auto;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:.875rem 1rem;font-size:.875rem;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;transition:color .15s,border-color .15s;white-space:nowrap}
+.tab-btn .n{font-family:'JetBrains Mono',monospace;font-size:.6875rem;letter-spacing:.14em;color:var(--muted-soft)}
+.tab-btn[aria-current="true"]{color:var(--ink);border-color:var(--clay)}
+.tab-btn[aria-current="true"] .n{color:var(--clay)}
+.tab-btn:hover:not([aria-current="true"]){color:var(--ink);border-color:var(--rule)}
+
+/* SUB-NAV */
+.sub-nav{display:flex;flex-wrap:wrap;gap:.375rem;margin:1.5rem 0 2rem}
+.sub-nav button{background:transparent;border:1px solid var(--rule);color:var(--muted);padding:.5rem .875rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.14em;transition:all .15s;border-radius:4px}
+.sub-nav button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.sub-nav button:hover:not([aria-pressed="true"]){border-color:rgba(26,23,20,.4);color:var(--ink)}
+
+/* PAGE / SUB visibility */
+.page,.sub{display:none}
+.page.active,.sub.active{display:block}
+
+/* HERO */
+main{padding:3rem 0 4rem;min-height:calc(100dvh - 14rem)}
+.hero{display:grid;grid-template-columns:repeat(12,1fr);gap:1.5rem}
+.hero-text{grid-column:1 / -1}
+h1.headline{font-size:clamp(2.25rem,7vw,4.25rem);line-height:1.02;letter-spacing:-.025em}
+h1.headline em{font-style:italic;color:var(--clay);font-weight:400}
+.body-copy{margin:1.5rem 0 0;font-size:1.0625rem;color:var(--muted);max-width:38rem}
+.actions{margin-top:2.25rem;display:flex;flex-wrap:wrap;gap:.75rem}
+
+.btn{display:inline-flex;align-items:center;gap:.5rem;height:2.75rem;padding:0 1.25rem;border-radius:4px;font-size:.9375rem;text-decoration:none;border:1px solid;transition:background .15s,color .15s,border-color .15s}
+.btn-primary{background:var(--clay);color:var(--paper);border-color:var(--clay)}
+.btn-primary:hover{background:var(--clay-dark);border-color:var(--clay-dark)}
+.btn-secondary{background:transparent;color:var(--ink);border-color:var(--rule)}
+.btn-secondary:hover{border-color:rgba(26,23,20,.4);background:var(--paper)}
+.btn-sm{height:2.25rem;padding:0 .875rem;font-size:.8125rem}
+.btn-icon{display:inline-flex;align-items:center;justify-content:center;width:2.25rem;height:2.25rem;padding:0;border-radius:4px;border:1px solid var(--rule);background:transparent;color:var(--muted);transition:all .15s}
+.btn-icon:hover{color:var(--clay);border-color:var(--clay)}
+
+.trust{grid-column:1 / -1;border-left:1px solid var(--rule);padding:0 0 0 1.25rem;margin-top:2rem}
+.trust ul{list-style:none;margin:.75rem 0 0;padding:0}
+.trust li{display:flex;gap:.625rem;font-size:.9375rem;padding:.375rem 0}
+.trust li::before{content:'';width:1rem;height:1rem;flex-shrink:0;margin-top:.2rem;background:no-repeat center/1rem 1rem url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8553D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>")}
+
+/* HOME TILES */
+.tile-list{margin-top:4rem;border-top:1px solid var(--rule)}
+.tile{display:grid;grid-template-columns:3rem 1fr auto;gap:1rem;align-items:baseline;padding:1.5rem 0;border-bottom:1px solid var(--rule);color:inherit;text-decoration:none;transition:background .15s;cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left}
+.tile:hover{background:rgba(250,247,242,.6)}
+.tile-num{font-family:'JetBrains Mono',monospace;font-size:.6875rem;letter-spacing:.14em;text-transform:uppercase;color:var(--clay)}
+.tile h3{font-size:1.625rem}
+.tile p{margin:.375rem 0 0;color:var(--muted);font-size:.9375rem}
+.tile-arrow{color:var(--muted);font-size:.6875rem;letter-spacing:.14em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tile:hover .tile-arrow{color:var(--clay)}
+
+/* PAGE HEADER */
+.page-header{border-bottom:1px solid var(--rule);padding-bottom:2rem;margin-bottom:2rem}
+.page-header h1{font-size:clamp(2rem,4vw,2.75rem);line-height:1.1}
+.page-header p{margin:.875rem 0 0;color:var(--muted);max-width:42rem}
+
+/* SECTION DIVIDER */
+.divider{display:flex;align-items:center;gap:1rem;font-size:.6875rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin:1.5rem 0}
+.divider::after{content:'';flex:1;height:1px;background:var(--rule)}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:1fr;gap:1.5rem}
+.grid-3{display:grid;grid-template-columns:1fr;gap:1.5rem}
+@media(min-width:768px){
+  .hero-text{grid-column:1 / span 8}
+  .trust{grid-column:9 / span 4;margin-top:5rem}
+  .grid-2{grid-template-columns:5fr 7fr;gap:2rem}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  main{padding:4.5rem 0 5rem}
+}
+
+/* FORM */
+.field{display:flex;flex-direction:column;margin-bottom:1.125rem}
+.field label{font-size:.6875rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:.5rem}
+.input-wrap{position:relative}
+.input{width:100%;height:2.75rem;padding:.5rem .875rem;border:1px solid var(--rule);background:var(--paper);color:var(--ink);font-size:.9375rem;border-radius:0;font-family:inherit}
+.input.num,.input[type="number"]{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.input:focus{outline:none;border-color:var(--clay)}
+.input-wrap .prefix{position:absolute;left:.875rem;top:50%;transform:translateY(-50%);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.875rem;pointer-events:none}
+.input-wrap .suffix{position:absolute;right:.875rem;top:50%;transform:translateY(-50%);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.875rem;pointer-events:none}
+.input-wrap.has-prefix .input{padding-left:1.75rem}
+.input-wrap.has-suffix .input{padding-right:2.5rem}
+textarea.input{height:auto;min-height:6rem;padding:.75rem .875rem;font-family:inherit}
+
+/* RESULT ROW */
+.result{padding:.875rem 0;border-bottom:1px solid var(--rule);display:flex;align-items:baseline;justify-content:space-between;gap:1rem}
+.result-label{font-size:.6875rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.result-value{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:1rem;color:var(--ink)}
+.result.emphasis{padding:1.125rem 0}
+.result.emphasis .result-label{font-family:'Fraunces',serif;text-transform:none;letter-spacing:0;font-size:1.0625rem;color:var(--ink)}
+.result.emphasis .result-value{font-size:1.75rem;color:var(--clay)}
+.result-hint{font-size:.75rem;color:var(--muted-soft);margin-top:.125rem;display:block;text-transform:none;letter-spacing:0;font-family:'Inter Tight',sans-serif}
+
+/* SURFACE CARD */
+.surface{background:var(--paper);border:1px solid var(--rule);padding:1rem}
+
+/* COMP ROW */
+.comp-row{display:grid;grid-template-columns:1fr;gap:.5rem;padding:.875rem;background:var(--paper);border:1px solid var(--rule);margin-bottom:.625rem}
+@media(min-width:640px){.comp-row{grid-template-columns:2fr 1fr 1fr auto;gap:.625rem;align-items:end}}
+.comp-row .field{margin-bottom:0}
+.remove-btn{background:none;border:0;color:var(--muted);height:2.75rem;padding:0 .75rem;font-size:.75rem;display:inline-flex;align-items:center;gap:.25rem}
+.remove-btn:hover{color:var(--clay)}
+
+/* TABLE */
+table.tab{width:100%;border-collapse:collapse;font-size:.875rem}
+table.tab th{font-size:.6875rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:400;text-align:left;padding:.625rem .5rem;border-bottom:1px solid var(--rule)}
+table.tab td{padding:.625rem .5rem;border-bottom:1px solid var(--rule);vertical-align:top}
+table.tab tbody tr:last-child td{border-bottom:0}
+table.tab .num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+
+/* DICTIONARY */
+.dict-controls{display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem}
+.dict-search{position:relative;max-width:32rem}
+.dict-search .input{padding-left:2.5rem}
+.dict-search svg{position:absolute;left:.875rem;top:50%;transform:translateY(-50%);color:var(--muted)}
+.chip-row{display:flex;flex-wrap:wrap;gap:.375rem}
+.chip{background:transparent;border:1px solid var(--rule);color:var(--muted);padding:.4375rem .75rem;font-size:.6875rem;text-transform:uppercase;letter-spacing:.14em;border-radius:4px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip:hover:not([aria-pressed="true"]){color:var(--ink);border-color:rgba(26,23,20,.4)}
+.term-list{margin-top:1rem;border-top:1px solid var(--rule)}
+.term{display:grid;grid-template-columns:1fr;gap:.875rem;padding:1.5rem 0;border-bottom:1px solid var(--rule)}
+@media(min-width:768px){.term{grid-template-columns:8rem 1fr;gap:1.5rem}}
+.term-cat{font-family:'JetBrains Mono',monospace;font-size:.6875rem;text-transform:uppercase;letter-spacing:.14em;color:var(--clay)}
+.term h3{font-size:1.375rem;color:var(--ink)}
+.term .def{margin:.5rem 0 0;font-size:.9375rem;color:var(--ink);line-height:1.55}
+.term .ex{margin:.625rem 0 0;font-style:italic;color:var(--muted);font-size:.875rem;border-left:1px solid var(--rule);padding-left:.625rem}
+.term .ex-label{font-style:normal;font-family:'Inter Tight',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:.6875rem;color:var(--muted-soft);margin-right:.5rem}
+.term .alt{margin-top:.875rem;padding-top:.625rem;border-top:1px solid rgba(217,210,197,.6);font-size:.8125rem;color:var(--muted)}
+.term .alt strong{color:var(--ink);font-weight:500}
+
+/* CONTRACTS */
+.contract-row{display:grid;grid-template-columns:1fr;gap:.875rem;padding:1.5rem 0;border-bottom:1px solid var(--rule);align-items:start}
+@media(min-width:768px){.contract-row{grid-template-columns:1fr auto;gap:1.5rem;align-items:center}}
+.contract-row h3{font-size:1.375rem}
+.contract-row p{margin:.5rem 0 0;color:var(--muted);font-size:.875rem}
+.contract-actions{display:flex;flex-direction:column;gap:.5rem;flex-shrink:0}
+
+/* KANBAN */
+.kanban{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:1rem}
+@media(min-width:768px){.kanban{grid-template-columns:repeat(4,1fr)}}
+.column{background:var(--paper);border:1px solid var(--rule);padding:.875rem;min-height:18rem;display:flex;flex-direction:column}
+.column h3{font-size:.875rem;font-family:'Inter Tight',sans-serif;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:.875rem;display:flex;justify-content:space-between;align-items:center;font-weight:500}
+.column h3 .count{background:var(--bone);border:1px solid var(--rule);padding:.0625rem .375rem;font-size:.6875rem;color:var(--ink);font-family:'JetBrains Mono',monospace}
+.deal{background:var(--bone);border:1px solid var(--rule);padding:.75rem;margin-bottom:.5rem;cursor:default}
+.deal-addr{font-family:'Fraunces',serif;font-size:.9375rem;color:var(--ink);margin-bottom:.25rem;line-height:1.3}
+.deal-meta{font-size:.75rem;color:var(--muted);font-family:'JetBrains Mono',monospace;display:flex;gap:.625rem;margin-top:.375rem}
+.deal-actions{display:flex;gap:.25rem;margin-top:.625rem;flex-wrap:wrap}
+.deal-actions button{background:none;border:1px solid var(--rule);padding:.1875rem .5rem;font-size:.625rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.deal-actions button:hover{color:var(--clay);border-color:var(--clay)}
+.empty-col{text-align:center;color:var(--muted-soft);font-size:.8125rem;padding:1.5rem .5rem;font-style:italic}
+
+/* BUYERS */
+.buyers-list{margin-top:1rem}
+.buyer{display:grid;grid-template-columns:1fr auto;gap:1rem;padding:1rem;background:var(--paper);border:1px solid var(--rule);margin-bottom:.5rem;align-items:start}
+.buyer-name{font-family:'Fraunces',serif;font-size:1.125rem;color:var(--ink)}
+.buyer-meta{font-size:.8125rem;color:var(--muted);margin-top:.375rem;display:flex;flex-wrap:wrap;gap:.875rem;font-family:'JetBrains Mono',monospace}
+.tags{margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.25rem}
+.tag{background:var(--clay-soft);color:var(--clay);border:1px solid rgba(168,85,61,.3);padding:.125rem .5rem;font-size:.6875rem;text-transform:uppercase;letter-spacing:.14em}
+
+/* OUTPUT BLOCKS */
+.output-block{background:var(--paper);border:1px solid var(--rule);padding:1.25rem;margin-top:1rem;font-family:'Inter Tight',sans-serif;font-size:.875rem;line-height:1.6;white-space:pre-wrap;color:var(--ink)}
+.output-controls{display:flex;gap:.5rem;margin-bottom:.625rem;justify-content:flex-end}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(26,23,20,.5);z-index:50;align-items:center;justify-content:center;padding:1rem}
+.modal.active{display:flex}
+.modal-card{background:var(--bone);border:1px solid var(--rule);padding:1.5rem;max-width:28rem;width:100%;max-height:90dvh;overflow:auto}
+.modal-card h3{font-size:1.25rem;margin-bottom:1rem}
+.modal-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem}
+
+/* FOOTER */
+footer{border-top:1px solid var(--rule);margin-top:5rem;padding:2.5rem 0}
+.footer-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.footer-row p{margin:0;font-size:.6875rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+
+/* i18n */
+[data-lang]{display:none}
+html[lang="es"] [data-lang="es"]{display:revert}
+html[lang="en"] [data-lang="en"]{display:revert}
+span[data-lang],em[data-lang]{display:none}
+html[lang="es"] span[data-lang="es"],html[lang="es"] em[data-lang="es"]{display:inline}
+html[lang="en"] span[data-lang="en"],html[lang="en"] em[data-lang="en"]{display:inline}
+
+/* PRINT */
+@media print{
+  body{background:#fff;color:#000}
+  body::before{display:none}
+  header.site,nav.tabs,.tile-list,.actions,footer{display:none}
+}
+
+/* UTIL */
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.mt-1{margin-top:.5rem}.mt-2{margin-top:1rem}.mt-3{margin-top:1.5rem}.mt-4{margin-top:2rem}
+.flex{display:flex;gap:.5rem}
+.flex-wrap{flex-wrap:wrap}
+.hidden{display:none !important}
+.text-clay{color:var(--clay)}
+.disclaimer{margin-top:2rem;font-size:.75rem;color:var(--muted);font-style:italic;border-left:1px solid var(--rule);padding-left:.75rem;max-width:38rem;line-height:1.6}
+.callout{border-left:2px solid var(--clay);padding:.625rem .875rem;margin-top:1.25rem;background:var(--clay-soft)}
+.callout .eyebrow{color:var(--clay);margin-bottom:.25rem}
+</style>
+</head>
+<body>
+<div class="layer">
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container header-row">
+    <a class="wordmark" href="#" onclick="showPage('home');return false;">
+      <span>JD</span><span class="ap">&rsquo;</span><span>s</span>
+      <span class="sub">Property Solutions</span>
+    </a>
+    <nav class="lang-toggle" aria-label="Language">
+      <button id="lang-es" aria-pressed="true">ES</button>
+      <span class="sep" aria-hidden="true">/</span>
+      <button id="lang-en" aria-pressed="false">EN</button>
+    </nav>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs">
+  <div class="container">
+    <div class="tabs-row" role="tablist">
+      <button class="tab-btn" data-tab="calc" role="tab"><span class="n">01</span><span data-lang="es">Calculadoras</span><span data-lang="en">Calculators</span></button>
+      <button class="tab-btn" data-tab="resources" role="tab"><span class="n">02</span><span data-lang="es">Recursos</span><span data-lang="en">Resources</span></button>
+      <button class="tab-btn" data-tab="software" role="tab"><span class="n">03</span><span data-lang="es">Software</span><span data-lang="en">Software</span></button>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+
+<!-- HOME -->
+<section class="page active" data-page="home">
+  <div class="hero">
+    <div class="hero-text">
+      <p class="marker" data-lang="es">— 01 / Plataforma de mayoreo</p>
+      <p class="marker" data-lang="en">— 01 / Wholesale platform</p>
+      <h1 class="headline" data-lang="es">Cerramos negocios con <em>claridad y estructura.</em></h1>
+      <h1 class="headline" data-lang="en">We close deals with <em>clarity and structure.</em></h1>
+      <p class="body-copy" data-lang="es">Plataforma de trabajo para inversionistas y mayoristas en bienes raíces. Calculadoras, contratos en español e inglés, y software para operar el día a día.</p>
+      <p class="body-copy" data-lang="en">A working platform for real estate investors and wholesalers. Calculators, contracts in Spanish and English, and software to operate day-to-day.</p>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="showPage('calc')"><span data-lang="es">Abrir calculadoras</span><span data-lang="en">Open calculators</span> →</button>
+        <button class="btn btn-secondary" onclick="showPage('resources');showSub('resources','dict')"><span data-lang="es">Ver diccionario</span><span data-lang="en">View dictionary</span></button>
+      </div>
+    </div>
+    <aside class="trust">
+      <p class="eyebrow" data-lang="es">Construido para operar</p>
+      <p class="eyebrow" data-lang="en">Built to operate</p>
+      <ul>
+        <li><span data-lang="es">Contratos en ambos idiomas</span><span data-lang="en">Contracts in both languages</span></li>
+        <li><span data-lang="es">Calculadoras con matemática real</span><span data-lang="en">Calculators with real math</span></li>
+        <li><span data-lang="es">Pipeline + compradores sin login</span><span data-lang="en">Pipeline + buyers, no login</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="tile-list">
+    <button class="tile" onclick="showPage('calc')">
+      <span class="tile-num">01</span>
+      <div>
+        <h3><span data-lang="es">Calculadoras</span><span data-lang="en">Calculators</span></h3>
+        <p><span data-lang="es">Hipoteca · ARV · Fix &amp; Flip — con MAO, ROI y amortización.</span><span data-lang="en">Mortgage · ARV · Fix &amp; Flip — with MAO, ROI and amortization.</span></p>
+      </div>
+      <span class="tile-arrow"><span data-lang="es">Abrir</span><span data-lang="en">Open</span> →</span>
+    </button>
+    <button class="tile" onclick="showPage('resources')">
+      <span class="tile-num">02</span>
+      <div>
+        <h3><span data-lang="es">Recursos</span><span data-lang="en">Resources</span></h3>
+        <p><span data-lang="es">Diccionario bilingüe de 60+ términos · Contratos en ES y EN descargables.</span><span data-lang="en">Bilingual dictionary with 60+ terms · Downloadable contracts ES &amp; EN.</span></p>
+      </div>
+      <span class="tile-arrow"><span data-lang="es">Abrir</span><span data-lang="en">Open</span> →</span>
+    </button>
+    <button class="tile" onclick="showPage('software')">
+      <span class="tile-num">03</span>
+      <div>
+        <h3><span data-lang="es">Software</span><span data-lang="en">Software</span></h3>
+        <p><span data-lang="es">Pipeline · Compradores · Skip trace · Cartas · Scripts.</span><span data-lang="en">Pipeline · Buyers · Skip trace · Letters · Scripts.</span></p>
+      </div>
+      <span class="tile-arrow"><span data-lang="es">Abrir</span><span data-lang="en">Open</span> →</span>
+    </button>
+  </div>
+</section>
+
+<!-- CALCULADORAS -->
+<section class="page" data-page="calc">
+  <div class="page-header">
+    <p class="marker">— 01</p>
+    <h1><span data-lang="es">Calculadoras</span><span data-lang="en">Calculators</span></h1>
+    <p><span data-lang="es">Hipoteca, ARV y Fix &amp; Flip con matemática real.</span><span data-lang="en">Mortgage, ARV, and Fix &amp; Flip with real math.</span></p>
+  </div>
+
+  <div class="sub-nav" data-sub-nav="calc">
+    <button data-sub="mortgage" aria-pressed="true"><span data-lang="es">Hipoteca</span><span data-lang="en">Mortgage</span></button>
+    <button data-sub="arv" aria-pressed="false">ARV</button>
+    <button data-sub="fixflip" aria-pressed="false">Fix &amp; Flip</button>
+  </div>
+
+  <!-- MORTGAGE -->
+  <div class="sub active" data-sub="mortgage">
+    <div class="grid-2">
+      <div>
+        <div class="divider"><span data-lang="es">Datos del préstamo</span><span data-lang="en">Loan details</span></div>
+        <div class="field">
+          <label><span data-lang="es">Monto del préstamo</span><span data-lang="en">Loan amount</span></label>
+          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="number" class="input num" id="m-loan" value="200000"/></div>
+        </div>
+        <div class="field">
+          <label><span data-lang="es">Tasa anual</span><span data-lang="en">Annual rate</span></label>
+          <div class="input-wrap has-suffix"><input type="number" class="input num" id="m-rate" step="0.125" value="7.25"/><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label><span data-lang="es">Plazo (años)</span><span data-lang="en">Term (years)</span></label>
+          <div class="input-wrap"><input type="number" class="input num" id="m-term" value="30"/></div>
+        </div>
+      </div>
+      <div>
+        <div class="divider"><span data-lang="es">Resultados</span><span data-lang="en">Results</span></div>
+        <div id="m-results"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARV -->
+  <div class="sub" data-sub="arv">
+    <div class="grid-2">
+      <div>
+        <div class="divider"><span data-lang="es">Propiedad sujeto</span><span data-lang="en">Subject property</span></div>
+        <div class="field">
+          <label><span data-lang="es">Pies cuadrados del sujeto</span><span data-lang="en">Subject square feet</span></label>
+          <div class="input-wrap has-suffix" style="max-width:14rem"><input type="number" class="input num" id="arv-sqft" value="1200"/><span class="suffix">ft²</span></div>
+        </div>
+
+        <div class="divider"><span data-lang="es">Comparables vendidos</span><span data-lang="en">Sold comparables</span></div>
+        <div id="arv-comps"></div>
+        <button class="btn btn-secondary btn-sm mt-1" onclick="addComp()">+ <span data-lang="es">Agregar comparable</span><span data-lang="en">Add comparable</span></button>
+      </div>
+      <div>
+        <div class="divider"><span data-lang="es">Resultados</span><span data-lang="en">Results</span></div>
+        <div id="arv-results"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIX & FLIP -->
+  <div class="sub" data-sub="fixflip">
+    <div class="grid-2">
+      <div>
+        <div class="divider"><span data-lang="es">Datos del negocio</span><span data-lang="en">Deal inputs</span></div>
+        <div class="field">
+          <label>ARV (<span data-lang="es">valor después de reparaciones</span><span data-lang="en">after-repair value</span>)</label>
+          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="number" class="input num" id="ff-arv" value="260000"/></div>
+        </div>
+        <div class="field">
+          <label><span data-lang="es">Costo de rehab</span><span data-lang="en">Rehab cost</span></label>
+          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="number" class="input num" id="ff-rehab" value="35000"/></div>
+        </div>
+        <div class="field">
+          <label><span data-lang="es">Precio de compra</span><span data-lang="en">Purchase price</span></label>
+          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="number" class="input num" id="ff-purchase" value="140000"/></div>
+        </div>
+        <div class="field">
+          <label><span data-lang="es">Costos de mantenimiento (holding)</span><span data-lang="en">Holding costs</span></label>
+          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="number" class="input num" id="ff-holding" value="5000"/></div>
+        </div>
+        <div class="field">
+          <label><span data-lang="es">Costos de venta</span><span data-lang="en">Selling costs</span></label>
+          <div class="input-wrap has-suffix"><input type="number" class="input num" id="ff-selling" value="8"/><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label><span data-lang="es">Regla MAO</span><span data-lang="en">MAO rule</span></label>
+          <div class="input-wrap has-suffix" style="max-width:11rem"><input type="number" class="input num" id="ff-rule" value="70"/><span class="suffix">%</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="divider"><span data-lang="es">Resultados</span><span data-lang="en">Results</span></div>
+        <div id="ff-results"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECURSOS -->
+<section class="page" data-page="resources">
+  <div class="page-header">
+    <p class="marker">— 02</p>
+    <h1><span data-lang="es">Recursos</span><span data-lang="en">Resources</span></h1>
+    <p><span data-lang="es">Diccionario bilingüe y contratos descargables.</span><span data-lang="en">Bilingual dictionary and downloadable contracts.</span></p>
+  </div>
+
+  <div class="sub-nav" data-sub-nav="resources">
+    <button data-sub="dict" aria-pressed="true"><span data-lang="es">Diccionario</span><span data-lang="en">Dictionary</span></button>
+    <button data-sub="contracts" aria-pressed="false"><span data-lang="es">Contratos</span><span data-lang="en">Contracts</span></button>
+  </div>
+
+  <!-- DICTIONARY -->
+  <div class="sub active" data-sub="dict">
+    <div class="dict-controls">
+      <div class="dict-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" class="input" id="dict-q" placeholder="Buscar término…"/>
+      </div>
+      <div class="chip-row" id="dict-chips"></div>
+      <p class="eyebrow" id="dict-count"></p>
+    </div>
+    <div class="term-list" id="dict-list"></div>
+  </div>
+
+  <!-- CONTRACTS -->
+  <div class="sub" data-sub="contracts">
+    <div class="divider"><span data-lang="es">Contratos disponibles</span><span data-lang="en">Available contracts</span></div>
+    <div id="contracts-list"></div>
+    <p class="disclaimer"><span data-lang="es">Estas plantillas están basadas en formatos internos con jurisdicción de arbitraje en Puerto Rico. Revísalas con un abogado licenciado antes de usarlas en producción.</span><span data-lang="en">These templates are based on internal formats with Puerto Rico arbitration jurisdiction. Have them reviewed by a licensed attorney before production use.</span></p>
+  </div>
+</section>
+
+<!-- SOFTWARE -->
+<section class="page" data-page="software">
+  <div class="page-header">
+    <p class="marker">— 03</p>
+    <h1><span data-lang="es">Software</span><span data-lang="en">Software</span></h1>
+    <p><span data-lang="es">Operación día a día. Los datos se guardan localmente en este dispositivo.</span><span data-lang="en">Day-to-day operation. Data is stored locally on this device.</span></p>
+  </div>
+
+  <div class="sub-nav" data-sub-nav="software">
+    <button data-sub="pipeline" aria-pressed="true">Pipeline</button>
+    <button data-sub="buyers" aria-pressed="false"><span data-lang="es">Compradores</span><span data-lang="en">Buyers</span></button>
+    <button data-sub="skip" aria-pressed="false">Skip Trace</button>
+    <button data-sub="mail" aria-pressed="false"><span data-lang="es">Cartas</span><span data-lang="en">Letters</span></button>
+    <button data-sub="scripts" aria-pressed="false">Scripts</button>
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="sub active" data-sub="pipeline">
+    <div class="flex flex-wrap mt-1">
+      <button class="btn btn-primary btn-sm" onclick="openDealModal()">+ <span data-lang="es">Agregar negocio</span><span data-lang="en">Add deal</span></button>
+      <button class="btn btn-secondary btn-sm" onclick="exportPipeline()"><span data-lang="es">Exportar JSON</span><span data-lang="en">Export JSON</span></button>
+    </div>
+    <div class="kanban" id="kanban"></div>
+  </div>
+
+  <!-- BUYERS -->
+  <div class="sub" data-sub="buyers">
+    <div class="flex flex-wrap mt-1">
+      <button class="btn btn-primary btn-sm" onclick="openBuyerModal()">+ <span data-lang="es">Agregar comprador</span><span data-lang="en">Add buyer</span></button>
+      <button class="btn btn-secondary btn-sm" onclick="exportBuyers()"><span data-lang="es">Exportar JSON</span><span data-lang="en">Export JSON</span></button>
+    </div>
+    <div class="buyers-list" id="buyers-list"></div>
+  </div>
+
+  <!-- SKIP TRACE -->
+  <div class="sub" data-sub="skip">
+    <div class="divider"><span data-lang="es">Datos del dueño</span><span data-lang="en">Owner data</span></div>
+    <p class="muted small"><span data-lang="es">Llena los datos que recopiles. El bloque formateado se actualiza en tiempo real para copiar.</span><span data-lang="en">Fill in the data you collect. The formatted block updates live for copying.</span></p>
+    <div class="grid-2 mt-2">
+      <div>
+        <div class="field"><label><span data-lang="es">Nombre del dueño</span><span data-lang="en">Owner name</span></label><input class="input" id="sk-name" oninput="renderSkip()"/></div>
+        <div class="field"><label><span data-lang="es">Dirección de la propiedad</span><span data-lang="en">Property address</span></label><input class="input" id="sk-prop" oninput="renderSkip()"/></div>
+        <div class="field"><label><span data-lang="es">Dirección postal del dueño</span><span data-lang="en">Owner mailing address</span></label><input class="input" id="sk-mail" oninput="renderSkip()"/></div>
+        <div class="field"><label><span data-lang="es">Teléfonos (uno por línea)</span><span data-lang="en">Phones (one per line)</span></label><textarea class="input" id="sk-phones" rows="3" oninput="renderSkip()"></textarea></div>
+        <div class="field"><label>Emails</label><textarea class="input" id="sk-emails" rows="2" oninput="renderSkip()"></textarea></div>
+        <div class="field"><label><span data-lang="es">Personas relacionadas</span><span data-lang="en">Related people</span></label><textarea class="input" id="sk-related" rows="2" oninput="renderSkip()"></textarea></div>
+        <div class="field"><label><span data-lang="es">Estructura legal (vesting)</span><span data-lang="en">Vesting / LLC</span></label><input class="input" id="sk-vesting" oninput="renderSkip()"/></div>
+      </div>
+      <div>
+        <div class="divider"><span data-lang="es">Resultado formateado</span><span data-lang="en">Formatted output</span></div>
+        <div class="output-controls"><button class="btn btn-secondary btn-sm" onclick="copyOut('sk-output')"><span data-lang="es">Copiar</span><span data-lang="en">Copy</span></button></div>
+        <div class="output-block" id="sk-output"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIL -->
+  <div class="sub" data-sub="mail">
+    <div class="divider"><span data-lang="es">Generador de cartas directas</span><span data-lang="en">Direct mail generator</span></div>
+    <div class="grid-2">
+      <div>
+        <div class="field">
+          <label><span data-lang="es">Tipo de motivación</span><span data-lang="en">Motivation type</span></label>
+          <select class="input" id="mail-type" onchange="renderMail()">
+            <option value="probate"><span></span></option>
+            <option value="preforeclosure"></option>
+            <option value="tired"></option>
+            <option value="vacant"></option>
+            <option value="absentee"></option>
+            <option value="taxes"></option>
+          </select>
+        </div>
+        <div class="field"><label><span data-lang="es">Nombre del dueño</span><span data-lang="en">Owner name</span></label><input class="input" id="mail-owner" placeholder="John Doe" oninput="renderMail()"/></div>
+        <div class="field"><label><span data-lang="es">Dirección de la propiedad</span><span data-lang="en">Property address</span></label><input class="input" id="mail-addr" placeholder="123 Main St" oninput="renderMail()"/></div>
+        <div class="field"><label><span data-lang="es">Tu nombre y teléfono</span><span data-lang="en">Your name and phone</span></label><input class="input" id="mail-me" placeholder="JD · (787) 555-1234" oninput="renderMail()"/></div>
+      </div>
+      <div>
+        <div class="divider"><span data-lang="es">Carta generada</span><span data-lang="en">Generated letter</span></div>
+        <div class="output-controls"><button class="btn btn-secondary btn-sm" onclick="copyOut('mail-output')"><span data-lang="es">Copiar</span><span data-lang="en">Copy</span></button><button class="btn btn-secondary btn-sm" onclick="printOut('mail-output')"><span data-lang="es">Imprimir</span><span data-lang="en">Print</span></button></div>
+        <div class="output-block" id="mail-output"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <div class="sub" data-sub="scripts">
+    <div class="divider"><span data-lang="es">Constructor de scripts de llamadas</span><span data-lang="en">Cold call script builder</span></div>
+    <div class="grid-2">
+      <div>
+        <div class="field">
+          <label><span data-lang="es">Tipo de lead</span><span data-lang="en">Lead type</span></label>
+          <select class="input" id="sc-type" onchange="renderScript()">
+            <option value="absentee"></option>
+            <option value="probate"></option>
+            <option value="preforeclosure"></option>
+            <option value="tired"></option>
+            <option value="fsbo"></option>
+            <option value="vacant"></option>
+          </select>
+        </div>
+        <div class="field">
+          <label><span data-lang="es">Tono</span><span data-lang="en">Tone</span></label>
+          <select class="input" id="sc-tone" onchange="renderScript()">
+            <option value="consult"></option>
+            <option value="direct"></option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="divider"><span data-lang="es">Script generado</span><span data-lang="en">Generated script</span></div>
+        <div class="output-controls"><button class="btn btn-secondary btn-sm" onclick="copyOut('sc-output')"><span data-lang="es">Copiar</span><span data-lang="en">Copy</span></button><button class="btn btn-secondary btn-sm" onclick="printOut('sc-output')"><span data-lang="es">Imprimir</span><span data-lang="en">Print</span></button></div>
+        <div class="output-block" id="sc-output"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- MODAL: Deal -->
+<div class="modal" id="deal-modal" onclick="if(event.target===this)closeModal('deal-modal')">
+  <div class="modal-card">
+    <h3 id="deal-modal-title"><span data-lang="es">Nuevo negocio</span><span data-lang="en">New deal</span></h3>
+    <div class="field"><label><span data-lang="es">Dirección</span><span data-lang="en">Address</span></label><input class="input" id="d-addr"/></div>
+    <div class="field"><label><span data-lang="es">Vendedor</span><span data-lang="en">Seller</span></label><input class="input" id="d-seller"/></div>
+    <div class="grid-3" style="gap:.625rem">
+      <div class="field"><label><span data-lang="es">Compra</span><span data-lang="en">Purchase</span></label><input class="input num" type="number" id="d-purchase"/></div>
+      <div class="field"><label>ARV</label><input class="input num" type="number" id="d-arv"/></div>
+      <div class="field"><label>Rehab</label><input class="input num" type="number" id="d-rehab"/></div>
+    </div>
+    <div class="field"><label><span data-lang="es">Notas</span><span data-lang="en">Notes</span></label><textarea class="input" id="d-notes" rows="2"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('deal-modal')"><span data-lang="es">Cancelar</span><span data-lang="en">Cancel</span></button>
+      <button class="btn btn-primary btn-sm" onclick="saveDeal()"><span data-lang="es">Guardar</span><span data-lang="en">Save</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Buyer -->
+<div class="modal" id="buyer-modal" onclick="if(event.target===this)closeModal('buyer-modal')">
+  <div class="modal-card">
+    <h3 id="buyer-modal-title"><span data-lang="es">Nuevo comprador</span><span data-lang="en">New buyer</span></h3>
+    <div class="field"><label><span data-lang="es">Nombre</span><span data-lang="en">Name</span></label><input class="input" id="b-name"/></div>
+    <div class="grid-2" style="gap:.625rem">
+      <div class="field"><label><span data-lang="es">Teléfono</span><span data-lang="en">Phone</span></label><input class="input" id="b-phone"/></div>
+      <div class="field"><label>Email</label><input class="input" id="b-email"/></div>
+    </div>
+    <div class="grid-2" style="gap:.625rem">
+      <div class="field"><label><span data-lang="es">Precio mín.</span><span data-lang="en">Min price</span></label><div class="input-wrap has-prefix"><span class="prefix">$</span><input class="input num" type="number" id="b-min"/></div></div>
+      <div class="field"><label><span data-lang="es">Precio máx.</span><span data-lang="en">Max price</span></label><div class="input-wrap has-prefix"><span class="prefix">$</span><input class="input num" type="number" id="b-max"/></div></div>
+    </div>
+    <div class="field"><label><span data-lang="es">Áreas (separadas por coma)</span><span data-lang="en">Areas (comma-separated)</span></label><input class="input" id="b-areas" placeholder="00907, 00911, Bayamón"/></div>
+    <div class="field"><label><span data-lang="es">Tags (separados por coma)</span><span data-lang="en">Tags (comma-separated)</span></label><input class="input" id="b-tags" placeholder="cash, fix-flip, sub-to"/></div>
+    <div class="field"><label><span data-lang="es">Notas</span><span data-lang="en">Notes</span></label><textarea class="input" id="b-notes" rows="2"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('buyer-modal')"><span data-lang="es">Cancelar</span><span data-lang="en">Cancel</span></button>
+      <button class="btn btn-primary btn-sm" onclick="saveBuyer()"><span data-lang="es">Guardar</span><span data-lang="en">Save</span></button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container footer-row">
+    <a class="wordmark" href="#" onclick="showPage('home');return false;" style="font-size:.9375rem"><span>JD</span><span class="ap">&rsquo;</span><span>s</span><span class="sub">Property Solutions</span></a>
+    <p><span data-lang="es">&copy; 2026 &middot; Todos los derechos reservados</span><span data-lang="en">&copy; 2026 &middot; All rights reserved</span></p>
+  </div>
+</footer>
+
+</div>
+
+<script>
+/* ============================================================
+   DATA — Dictionary (60+ terms), Contracts, Letter & Script templates
+   ============================================================ */
+
+const CATS = {
+  wholesaling: {es:'Wholesaling',en:'Wholesaling'},
+  creativo: {es:'Financiamiento creativo',en:'Creative finance'},
+  analisis: {es:'Análisis de negocios',en:'Deal analysis'},
+  financiamiento: {es:'Financiamiento',en:'Financing'},
+  legal: {es:'Legal',en:'Legal'},
+  marketing: {es:'Marketing',en:'Marketing'}
+};
+
+const DICT = [
+{id:'wholesaling',c:'wholesaling',es:{t:'Wholesaling (mayoreo)',d:'Estrategia donde el mayorista pone una propiedad bajo contrato y luego cede ese contrato a un comprador final por una tarifa, sin tomar título.',e:'Pongo la propiedad bajo contrato en $100K y la cedo a un inversionista en $110K — gano $10K sin comprarla.'},en:{t:'Wholesaling',d:'Strategy where the wholesaler puts a property under contract and assigns it to an end buyer for a fee, without taking title.',e:'I put the property under contract at $100K and assign it to an investor for $110K — I make $10K without owning it.'}},
+{id:'assignment',c:'wholesaling',es:{t:'Cesión / Asignación de contrato',d:'Transferencia legal del derecho del comprador a comprar una propiedad bajo un contrato existente, a un tercero.',e:'Mediante un Contrato de Asignación, transfiero mis derechos al comprador final.'},en:{t:'Assignment of contract',d:'Legal transfer of the buyer’s right to purchase a property under an existing contract to a third party.',e:'Via an Assignment Agreement, I transfer my rights to the end buyer.'}},
+{id:'assignment-fee',c:'wholesaling',es:{t:'Assignment Fee',d:'Cantidad pagada por el comprador final al mayorista por ceder el contrato. Es la ganancia del mayorista.',e:'Mi assignment fee fue de $15,000 — $1K inicial y $14K al cierre.'},en:{t:'Assignment fee',d:'Amount paid by the end buyer to the wholesaler for assigning the contract. The wholesaler’s profit.',e:'My assignment fee was $15,000 — $1K upfront and $14K at closing.'}},
+{id:'double-close',c:'wholesaling',es:{t:'Doble cierre (Double close)',d:'Estructura donde el mayorista compra y revende inmediatamente al comprador final en dos cierres separados, usando fondos transaccionales.',e:'Hicimos doble cierre para ocultar el assignment fee.'},en:{t:'Double close',d:'Structure where the wholesaler buys and immediately resells to the end buyer in two separate closings.',e:'We did a double close to keep the assignment fee private.'}},
+{id:'end-buyer',c:'wholesaling',es:{t:'Comprador final (End buyer)',d:'El inversionista que finalmente compra la propiedad del mayorista. Paga en efectivo y reforma o renta.',e:'Mi lista de compradores recibe cada negocio antes de salir al público.'},en:{t:'End buyer',d:'The investor who ultimately purchases the property from the wholesaler.',e:'My end buyer list receives every deal before it goes public.'}},
+{id:'jv',c:'wholesaling',es:{t:'Joint Venture (JV)',d:'Acuerdo entre dos mayoristas o inversionistas para colaborar en un negocio y dividir la ganancia.',e:'Hice un JV 50/50 — él trajo el negocio, yo traje el comprador.'},en:{t:'Joint Venture (JV)',d:'Agreement between two wholesalers or investors to collaborate on a deal and split profit.',e:'I JV’d 50/50 — he brought the deal, I brought the buyer.'}},
+{id:'pof',c:'wholesaling',es:{t:'POF (Proof of Funds)',d:'Documento que prueba que el comprador tiene los fondos para cerrar.',e:'Mostré POF de $200K para que aceptaran la oferta.'},en:{t:'POF (Proof of Funds)',d:'Document proving the buyer has funds to close.',e:'Showed $200K POF so they’d accept the offer.'}},
+{id:'loi',c:'wholesaling',es:{t:'LOI (Carta de Intención)',d:'Carta informal del comprador con términos preliminares antes de firmar contrato.',e:'Mandé LOI a $145K, contraoferta a $155K, cerramos en $150K.'},en:{t:'LOI (Letter of Intent)',d:'Informal letter with preliminary offer terms before signing a contract.',e:'Sent LOI at $145K, counter at $155K, closed at $150K.'}},
+
+{id:'arv',c:'analisis',es:{t:'ARV (After Repair Value)',d:'Valor de mercado estimado de la propiedad después de completar todas las reparaciones.',e:'ARV $260K basado en comparables vendidos en los últimos 90 días.'},en:{t:'ARV (After Repair Value)',d:'Estimated market value after all repairs are completed.',e:'ARV $260K based on comps sold in the last 90 days.'}},
+{id:'mao',c:'analisis',es:{t:'MAO (Máxima Oferta Permitida)',d:'La oferta máxima que un inversionista puede hacer y mantener margen objetivo. Fórmula: ARV × 70% − rehab.',e:'MAO = ($260K × 0.70) − $35K = $147K.'},en:{t:'MAO (Maximum Allowable Offer)',d:'The highest offer to keep target margin. Formula: ARV × 70% − rehab.',e:'MAO = ($260K × 0.70) − $35K = $147K.'}},
+{id:'regla-70',c:'analisis',es:{t:'Regla del 70%',d:'Heurística: no pagar más del 70% del ARV menos costo de reparación. Ajustable.',e:'En mercados calientes ajustamos a 75%; en lentos bajamos a 65%.'},en:{t:'70% rule',d:'Heuristic: pay no more than 70% of ARV minus repair cost.',e:'Hot markets we go to 75%; slow markets down to 65%.'}},
+{id:'fix-flip',c:'analisis',es:{t:'Fix & Flip',d:'Comprar una propiedad, repararla y revenderla en el corto plazo para ganancia.',e:'Mi último flip generó $42K en 4 meses tras una rehab de $35K.'},en:{t:'Fix & Flip',d:'Buying a property, rehabbing, and reselling short-term for profit.',e:'My last flip netted $42K in 4 months after a $35K rehab.'}},
+{id:'brrrr',c:'analisis',es:{t:'BRRRR',d:'Buy, Rehab, Rent, Refinance, Repeat — construir un portafolio refinanciando para recuperar capital.',e:'Hice BRRRR y saqué el 100% del capital al refinanciar.'},en:{t:'BRRRR',d:'Buy, Rehab, Rent, Refinance, Repeat — build portfolio by refinancing.',e:'I did a BRRRR and pulled out 100% of capital at refinance.'}},
+{id:'comps',c:'analisis',es:{t:'Comparables (Comps)',d:'Propiedades vendidas recientemente similares al sujeto, usadas para estimar valor.',e:'Saqué tres comps a media milla, vendidos en 60 días.'},en:{t:'Comparables (Comps)',d:'Recently sold similar properties used to estimate value.',e:'I pulled three comps within half a mile, sold within 60 days.'}},
+{id:'ppsf',c:'analisis',es:{t:'$/pie cuadrado ($/sqft)',d:'Precio por pie cuadrado. Métrica común para comparar.',e:'Comps promedian $185/ft²; sujeto 1,200 ft² → $222K.'},en:{t:'$/sqft (PPSF)',d:'Price per square foot. Common comparison metric.',e:'Comps average $185/sqft; subject 1,200 sqft → $222K.'}},
+{id:'cap-rate',c:'analisis',es:{t:'Cap Rate',d:'NOI anual ÷ precio de compra. Rendimiento sin financiamiento.',e:'NOI $14,400 / compra $160K = 9% cap rate.'},en:{t:'Cap Rate',d:'Annual NOI ÷ purchase price. Unleveraged yield.',e:'NOI $14,400 / $160K purchase = 9% cap rate.'}},
+{id:'coc',c:'analisis',es:{t:'Cash-on-Cash Return',d:'Flujo anual antes de impuestos ÷ efectivo invertido.',e:'Flujo $6K sobre $40K de capital = 15% cash-on-cash.'},en:{t:'Cash-on-Cash Return',d:'Annual pre-tax cash flow ÷ cash invested.',e:'Cash flow $6K on $40K equity = 15% cash-on-cash.'}},
+{id:'noi',c:'analisis',es:{t:'NOI',d:'Ingreso bruto menos vacancia y gastos operativos. Excluye deuda.',e:'Renta $1,400/mes × 12 − $2,400 gastos = $14,400 NOI.'},en:{t:'NOI',d:'Gross income minus vacancy and op expenses. Excludes debt.',e:'Rent $1,400/mo × 12 − $2,400 expenses = $14,400 NOI.'}},
+{id:'mls',c:'analisis',es:{t:'MLS',d:'Base de datos profesional de propiedades en venta. Acceso vía agente con licencia.',e:'Los comps de MLS son los más confiables.'},en:{t:'MLS',d:'Professional listing database. Access through licensed agent.',e:'MLS comps are most reliable.'}},
+{id:'section-8',c:'analisis',es:{t:'Sección 8',d:'Programa HUD que subsidia alquiler a inquilinos de bajos ingresos.',e:'Sección 8 paga $1,250/mes directo al casero.'},en:{t:'Section 8',d:'HUD program subsidizing rent for low-income tenants.',e:'Section 8 pays $1,250/mo direct to landlord.'}},
+{id:'fmr',c:'analisis',es:{t:'FMR (Fair Market Rent)',d:'Renta justa publicada por HUD por código postal — base de Sección 8.',e:'FMR para 3 recámaras en mi zip = $1,425.'},en:{t:'FMR (Fair Market Rent)',d:'Fair Market Rent published by HUD by zip code.',e:'FMR for 3-bed in my zip = $1,425.'}},
+
+{id:'dscr',c:'financiamiento',es:{t:'DSCR',d:'NOI ÷ pago anual de deuda. Prestamistas DSCR califican sin verificar ingresos.',e:'NOI $14,400 / pago anual $11,000 = DSCR 1.31.'},en:{t:'DSCR',d:'NOI ÷ annual debt payment. DSCR lenders qualify without income docs.',e:'NOI $14,400 / $11,000 = DSCR 1.31.'}},
+{id:'hard-money',c:'financiamiento',es:{t:'Hard Money',d:'Préstamo a corto plazo basado en el valor de la propiedad.',e:'Cerré con hard money al 11% por 12 meses, 2 puntos.'},en:{t:'Hard money',d:'Short-term loan based on property value.',e:'Closed with hard money at 11% for 12 months, 2 points.'}},
+{id:'private-money',c:'financiamiento',es:{t:'Dinero privado (Private Money)',d:'Préstamo de un individuo (no banco) con términos flexibles.',e:'Mi prestamista privado: 8% solo intereses por 18 meses.'},en:{t:'Private money',d:'Loan from an individual (not a bank), flexible terms.',e:'My private lender: 8% interest-only for 18 months.'}},
+{id:'transactional',c:'financiamiento',es:{t:'Financiamiento transaccional',d:'Préstamo de horas/días para doble cierres.',e:'Usé $150K transactional por 4 horas — costo $2,000.'},en:{t:'Transactional funding',d:'Hours/days-long loan used in double closings.',e:'$150K transactional for 4 hours — cost $2,000.'}},
+{id:'gap',c:'financiamiento',es:{t:'Gap Funding',d:'Financiamiento que cubre la diferencia entre el préstamo y el capital necesario.',e:'Mi gap funder: $25K al 15% por el efectivo restante.'},en:{t:'Gap funding',d:'Covers the gap between primary loan and cash needed.',e:'Gap funder: $25K at 15% for remaining cash.'}},
+{id:'ltv',c:'financiamiento',es:{t:'LTV (Loan-to-Value)',d:'Razón préstamo/valor. Métrica clave de prestamistas.',e:'LTV 75% — préstamo $150K sobre valor $200K.'},en:{t:'LTV',d:'Loan to value ratio. Key lender metric.',e:'LTV 75% — $150K loan on $200K value.'}},
+{id:'arv-ltv',c:'financiamiento',es:{t:'ARV LTV',d:'Razón préstamo/ARV — hard money típicamente 65-75% del ARV.',e:'ARV LTV 70% en $260K = máximo $182K.'},en:{t:'ARV LTV',d:'Loan/ARV ratio — hard money typically 65-75%.',e:'ARV LTV 70% on $260K = max $182K.'}},
+{id:'points',c:'financiamiento',es:{t:'Puntos (Points)',d:'1 punto = 1% del préstamo. Origination fee.',e:'2 puntos sobre $150K = $3,000 al cierre.'},en:{t:'Points',d:'1 point = 1% of the loan. Origination fee.',e:'2 points on $150K = $3,000 at closing.'}},
+{id:'cashout',c:'financiamiento',es:{t:'Refinanciamiento Cash-Out',d:'Refinanciar por más del saldo y sacar la diferencia en efectivo.',e:'Cash-out al 75% LTV — saqué $40K para el siguiente deal.'},en:{t:'Cash-out refinance',d:'Refinance for more than balance, take difference as cash.',e:'Cash-out at 75% LTV — pulled $40K for next deal.'}},
+
+{id:'subject-to',c:'creativo',es:{t:'Subject-To',d:'Comprador toma título, hipoteca existente se queda a nombre del vendedor; el comprador paga.',e:'Compré sub-to: hipoteca al 3.5% se quedó a nombre del vendedor.'},en:{t:'Subject-To',d:'Buyer takes title; seller’s mortgage stays in seller’s name.',e:'I bought sub-to: 3.5% mortgage stayed in seller’s name.'}},
+{id:'seller-fin',c:'creativo',es:{t:'Financiamiento del vendedor',d:'El vendedor actúa como banco con un pagaré garantizado por la propiedad.',e:'Enganche $20K, 6% por 10 años, balloon al 5to.'},en:{t:'Seller financing',d:'Seller acts as bank with note secured by the property.',e:'Down $20K, 6% over 10 years, 5-year balloon.'}},
+{id:'wrap',c:'creativo',es:{t:'Wraparound Mortgage',d:'Hipoteca que envuelve la del vendedor. El comprador paga al vendedor.',e:'Wrap al 7% — el vendedor sigue pagando su 3.5% y guarda el spread.'},en:{t:'Wraparound mortgage',d:'Mortgage wrapping seller’s existing one. Buyer pays seller.',e:'7% wrap — seller keeps paying 3.5% and pockets the spread.'}},
+{id:'novation',c:'creativo',es:{t:'Novación (Novation)',d:'Sustitución de un contrato por uno nuevo con consentimiento.',e:'Novación para vender por encima del contrato original.'},en:{t:'Novation',d:'Replacement of contract with a new one by consent.',e:'Novation to sell above the original contract.'}},
+{id:'option',c:'creativo',es:{t:'Contrato de Opción',d:'Derecho (no obligación) de comprar a precio fijo dentro de un plazo.',e:'Pagué $1K por una opción de 6 meses a $180K.'},en:{t:'Option contract',d:'Right (not obligation) to buy at fixed price within a window.',e:'Paid $1K for a 6-month option at $180K.'}},
+{id:'lease-option',c:'creativo',es:{t:'Lease Option',d:'Arrendamiento con opción de compra a precio fijo más tarde.',e:'Renta $1,400/mes, opción a $200K en 24 meses.'},en:{t:'Lease option',d:'Lease with right to buy at fixed price later.',e:'Rent $1,400/mo, option at $200K in 24 months.'}},
+{id:'balloon',c:'creativo',es:{t:'Pago Balloon',d:'Pago grande del saldo restante al final del plazo.',e:'Amortizado a 30 años pero balloon al año 5.'},en:{t:'Balloon payment',d:'Large remaining balance at end of loan term.',e:'30-year amortized but balloon at year 5.'}},
+{id:'land-trust',c:'creativo',es:{t:'Land Trust',d:'Fiduciario sostiene título para beneficio del beneficiario. Útil para sub-to.',e:'Pusimos la propiedad en land trust para sub-to.'},en:{t:'Land trust',d:'Trustee holds title for beneficiary. Useful for sub-to.',e:'We placed the property in a land trust for sub-to.'}},
+{id:'due-on-sale',c:'creativo',es:{t:'Cláusula Due-on-Sale',d:'Permite al prestamista exigir el saldo total al transferir la propiedad. Riesgo principal en sub-to.',e:'Riesgo de due-on-sale, pero rara vez los bancos la ejercen.'},en:{t:'Due-on-sale clause',d:'Lender can demand full balance when property transfers.',e:'Due-on-sale risk exists but banks rarely call it.'}},
+
+{id:'emd',c:'legal',es:{t:'EMD (Earnest Money Deposit)',d:'Depósito de buena fe. Se libera al cierre o si el comprador incumple post-inspección.',e:'EMD $1,000 retenido por la titulera hasta el cierre.'},en:{t:'EMD',d:'Good-faith deposit. Released at closing or on post-inspection default.',e:'EMD $1,000 held by title company until closing.'}},
+{id:'title',c:'legal',es:{t:'Compañía de título',d:'Entidad neutral que maneja el cierre, asegura el título, retiene depósitos.',e:'La titulera revisa el título y emite la póliza.'},en:{t:'Title company',d:'Neutral entity handling closing, title insurance, escrow.',e:'Title company reviews title and issues the policy.'}},
+{id:'escrow',c:'legal',es:{t:'Escrow',d:'Cuenta/proceso neutral donde se retienen fondos hasta cumplir condiciones.',e:'Los $1,000 de EMD están en escrow hasta el cierre.'},en:{t:'Escrow',d:'Neutral account where funds are held until conditions met.',e:'$1,000 EMD sits in escrow until closing.'}},
+{id:'inspection',c:'legal',es:{t:'Período de Inspección',d:'Plazo donde el comprador puede inspeccionar y cancelar sin penalidad.',e:'10 días de inspección — cancelas y recuperas el EMD.'},en:{t:'Inspection period',d:'Window to inspect and cancel without penalty.',e:'10-day inspection — cancel and get EMD back.'}},
+{id:'as-is',c:'legal',es:{t:'As Is (tal como está)',d:'La propiedad se vende en su condición actual; sin reparaciones.',e:'Comprada as-is — sin garantías de techo o HVAC.'},en:{t:'As Is',d:'Property sold in current condition; no repairs.',e:'Bought as-is — no warranties on roof or HVAC.'}},
+{id:'addendum',c:'legal',es:{t:'Addendum',d:'Documento añadido que modifica el contrato principal sin reemplazarlo.',e:'Firmamos un addendum extendiendo el cierre 15 días.'},en:{t:'Addendum',d:'Added document modifying main contract.',e:'Signed an addendum extending closing by 15 days.'}},
+{id:'closing-costs',c:'legal',es:{t:'Costos de Cierre',d:'Honorarios pagados al cierre (titulera, escrow, impuestos). 2-5% del precio.',e:'En este contrato ambos comparten costos 50/50.'},en:{t:'Closing costs',d:'Fees paid at closing (title, escrow, taxes). 2-5%.',e:'Both parties split closing costs 50/50.'}},
+{id:'termination',c:'legal',es:{t:'Acuerdo de Terminación',d:'Documento firmado para cancelar formalmente un contrato.',e:'Firmamos terminación mutua — EMD regresó al comprador.'},en:{t:'Termination agreement',d:'Signed document to formally cancel a contract.',e:'Signed mutual termination — EMD went back to buyer.'}},
+
+{id:'rvm',c:'marketing',es:{t:'RVM (Ringless Voicemail)',d:'Mensaje de voz dejado en el buzón sin que el teléfono suene.',e:'Enviamos 5,000 RVMs y conseguimos 12 leads.'},en:{t:'RVM',d:'Voicemail left without phone ringing.',e:'Blasted 5,000 RVMs and got 12 leads.'}},
+{id:'cold-call',c:'marketing',es:{t:'Cold Call',d:'Llamada a un prospecto que no ha solicitado contacto.',e:'Hago 100 cold calls al día — convierten al 1-2%.'},en:{t:'Cold call',d:'Call to a prospect who hasn’t requested contact.',e:'I make 100 cold calls a day — convert at 1-2%.'}},
+{id:'direct-mail',c:'marketing',es:{t:'Direct Mail',d:'Cartas o postales a propietarios con propuesta de compra.',e:'Mando 5,000 cartas/mes a probate y absentee.'},en:{t:'Direct mail',d:'Letters/postcards to owners with buy offer.',e:'I mail 5,000 pieces/month to probate and absentee.'}},
+{id:'skip-trace',c:'marketing',es:{t:'Skip Trace',d:'Investigar info de contacto del dueño (teléfono, email).',e:'Skip tracé 500 absentee — saqué 380 teléfonos.'},en:{t:'Skip trace',d:'Research owner contact info (phone, email).',e:'Skip traced 500 absentee — got 380 phones.'}},
+{id:'absentee',c:'marketing',es:{t:'Absentee Owner',d:'Propietario que no vive en la propiedad. Lista clave.',e:'Los absentee son inversionistas cansados — buenos motivados.'},en:{t:'Absentee owner',d:'Owner not living in the property.',e:'Absentee owners are often tired investors.'}},
+{id:'probate',c:'marketing',es:{t:'Probate (sucesión)',d:'Proceso legal para distribuir bienes de un fallecido. Leads motivados.',e:'Los probate tienen motivación alta — heredan una casa.'},en:{t:'Probate',d:'Legal process to distribute deceased’s assets.',e:'Probate leads are highly motivated.'}},
+{id:'pre-foreclosure',c:'marketing',es:{t:'Pre-ejecución hipotecaria',d:'Etapa después del aviso de incumplimiento, antes de la subasta.',e:'Los pre-foreclosure necesitan vender rápido.'},en:{t:'Pre-foreclosure',d:'After notice of default, before auction.',e:'Pre-foreclosure leads need to sell fast.'}},
+{id:'tired',c:'marketing',es:{t:'Tired Landlord',d:'Propietario de renta cansado de lidiar con la propiedad.',e:'Los tired landlords cierran rápido si el número les funciona.'},en:{t:'Tired landlord',d:'Rental owner tired of dealing with the property.',e:'Tired landlords close fast if number works.'}},
+{id:'vacant',c:'marketing',es:{t:'Propiedad vacante',d:'Casa desocupada. Indicador fuerte de motivación.',e:'Las vacantes son leads top — costo sin ingreso.'},en:{t:'Vacant property',d:'Unoccupied house. Strong motivation signal.',e:'Vacants are top leads — ongoing cost, no income.'}},
+{id:'list-pull',c:'marketing',es:{t:'List Pull',d:'Generar lista de prospectos filtrada por criterios.',e:'Saqué lista absentee + high equity + 1980 o antes.'},en:{t:'List pull',d:'Generate prospect list filtered by criteria.',e:'Pulled absentee + high equity + 1980 or older.'}},
+{id:'high-equity',c:'marketing',es:{t:'Alto Equity',d:'Propietario con poca o ninguna hipoteca — flexibilidad para negociar.',e:'Los high-equity pueden vender por debajo.'},en:{t:'High equity',d:'Owner with little/no mortgage.',e:'High-equity can sell below market.'}},
+{id:'driving',c:'marketing',es:{t:'Driving for Dollars',d:'Manejar vecindarios buscando propiedades distressed visibles.',e:'Manejé 4 horas — saqué 27 propiedades distressed.'},en:{t:'Driving for Dollars',d:'Driving neighborhoods for visible distressed properties.',e:'Drove 4 hours — added 27 distressed properties.'}},
+{id:'distressed',c:'marketing',es:{t:'Propiedad distressed',d:'Propiedad en mal estado o con dueño en situación difícil.',e:'Distressed exterior + alto equity + absentee = lead ideal.'},en:{t:'Distressed property',d:'Property in poor condition or owner in tough spot.',e:'Distressed + high equity + absentee = ideal lead.'}}
+];
+
+/* CONTRACTS — based on user's verbatim templates */
+const CONTRACTS = {
+  cash: {
+    es: {
+      title: 'CONTRATO DE PROMESA DE COMPRAVENTA',
+      sections: [
+        {n:'I',t:'PARTES',blocks:[{p:'Este Contrato (“Acuerdo”) de Promesa de Compraventa se celebra hoy [DIA] de [MES] del [AÑO], entre las siguientes partes:'},{l:['Vendedor: [NOMBRE_DEL_VENDEDOR]','Comprador: [NOMBRE_DEL_COMPRADOR]']},{p:'Comprar en los términos y condiciones que se especifican a continuación la propiedad descrita como:'},{p:'Dirección: [DIRECCION_DE_LA_PROPIEDAD]'},{p:'Ambas partes reconocen que:'},{l:['actúan de manera voluntaria','tienen capacidad legal para obligarse','entienden la naturaleza de este Acuerdo']}]},
+        {n:'II',t:'PROPIEDAD',blocks:[{p:'La propiedad objeto de este Acuerdo es:'},{p:'Dirección: [DIRECCION_DE_LA_PROPIEDAD]'}]},
+        {n:'III',t:'PRECIO DE COMPRA',blocks:[{p:'El precio acordado para la compraventa será: $[PRECIO_DE_COMPRA] USD.'},{p:'Este precio representa el acuerdo total entre las partes, sujeto a los términos establecidos en este documento.'}]},
+        {n:'IV',t:'DEPÓSITO (EMD)',blocks:[{p:'El depósito será de: $[MONTO_EMD] USD.'},{p:'Condiciones:'},{l:['Será pagado el día de la inspección o dentro de 24 horas posteriores.','Será no reembolsable una vez finalizado el periodo de inspección.','Será retenido por la parte designada para el cierre.']}]},
+        {n:'V',t:'PERIODO DE INSPECCIÓN',blocks:[{p:'El Comprador tendrá [DIAS_INSPECCION] días para:'},{l:['inspeccionar la propiedad','evaluar condiciones','validar el negocio']},{p:'Durante este periodo:'},{l:['el Comprador podrá cancelar sin penalidad','no estará obligado a continuar']},{p:'Una vez finalizado:'},{l:['el Comprador acepta continuar bajo las condiciones existentes']}]},
+        {n:'VI',t:'CONDICIÓN DE LA PROPIEDAD',blocks:[{p:'La propiedad será aceptada en condición: “As Is” (tal como está).'},{p:'El Vendedor declara que:'},{l:['no oculta información material conocida','permite inspección previa al cierre']}]},
+        {n:'VII',t:'ACCESO A LA PROPIEDAD',blocks:[{p:'El Comprador tendrá acceso razonable para:'},{l:['inspecciones','evaluaciones','visitas necesarias']},{p:'Todo acceso será coordinado previamente con el Vendedor.'}]},
+        {n:'VIII',t:'DERECHO DE CESIÓN',blocks:[{p:'El Comprador tendrá el derecho de:'},{l:['ceder','transferir','asignar']},{p:'su posición contractual sin necesidad de aprobación adicional del Vendedor.'},{p:'El Vendedor reconoce y acepta que:'},{l:['la parte que ejecutará el cierre puede ser distinta al Comprador original']}]},
+        {n:'IX',t:'CIERRE',blocks:[{p:'La fecha estimada de cierre será: [FECHA_CIERRE].'},{p:'El cierre podrá extenderse mediante acuerdo entre las partes si fuese necesario.'}]},
+        {n:'X',t:'COSTOS DE CIERRE',blocks:[{p:'Los costos serán asumidos por:'},{l:['☐ Comprador','☐ Vendedor','☐ Ambos']}]},
+        {n:'XI',t:'INCUMPLIMIENTO',blocks:[{p:'Si el Comprador incumple:'},{l:['perderá el depósito según lo establecido']},{p:'Si el Vendedor incumple:'},{l:['deberá devolver cualquier cantidad recibida','podrá estar sujeto a acciones adicionales']}]},
+        {n:'XII',t:'RESOLUCIÓN DE DISPUTAS',blocks:[{p:'Las partes acuerdan:'},{l:['Intentar mediación.','De no resolverse, arbitraje en Puerto Rico.']}]},
+        {n:'XIII',t:'MODIFICACIONES',blocks:[{p:'Cualquier cambio deberá:'},{l:['ser por escrito','firmado por ambas partes']}]},
+        {n:'XIV',t:'NATURALEZA DEL DOCUMENTO',blocks:[{p:'Este documento establece un acuerdo vinculante entre las partes.'},{p:'Cada parte reconoce que:'},{l:['ha leído el contenido','entiende los términos','actúa bajo su propio criterio']}]},
+        {n:'XV',t:'ACUERDO COMPLETO',blocks:[{p:'Este documento representa el acuerdo total entre las partes.'}]},
+        {n:'XVI',t:'FIRMAS',blocks:[{s:[{label:'Vendedor',name:true},{label:'Comprador',name:true},{label:'Testigo (Opcional)',name:true}]}]}
+      ]
+    },
+    en: {
+      title: 'PURCHASE & SALE AGREEMENT',
+      sections: [
+        {n:'I',t:'PARTIES',blocks:[{p:'This Purchase & Sale Agreement (“Agreement”) is entered into on this [DAY] day of [MONTH], [YEAR], by and between the following parties:'},{l:['Seller: [SELLER_NAME]','Buyer: [BUYER_NAME]']},{p:'Buyer agrees to purchase the property described as:'},{p:'Address: [PROPERTY_ADDRESS]'},{p:'Both parties acknowledge that they:'},{l:['are acting voluntarily','have legal capacity to be bound','understand the nature of this Agreement']}]},
+        {n:'II',t:'PROPERTY',blocks:[{p:'The property subject to this Agreement is:'},{p:'Address: [PROPERTY_ADDRESS]'}]},
+        {n:'III',t:'PURCHASE PRICE',blocks:[{p:'The agreed purchase price is: $[PURCHASE_PRICE] USD.'},{p:'This price represents the entire agreement between the parties.'}]},
+        {n:'IV',t:'EARNEST MONEY DEPOSIT (EMD)',blocks:[{p:'The deposit shall be: $[EMD_AMOUNT] USD.'},{p:'Conditions:'},{l:['Paid on the day of inspection or within 24 hours thereafter.','Non-refundable once the inspection period concludes.','Held by the party designated for closing.']}]},
+        {n:'V',t:'INSPECTION PERIOD',blocks:[{p:'Buyer shall have [INSPECTION_DAYS] days to:'},{l:['inspect the property','evaluate its condition','validate the deal']},{p:'During this period:'},{l:['Buyer may cancel without penalty','Buyer shall not be obligated to proceed']},{p:'Once concluded:'},{l:['Buyer agrees to proceed under existing conditions']}]},
+        {n:'VI',t:'CONDITION OF THE PROPERTY',blocks:[{p:'The property shall be accepted in “As Is” condition.'},{p:'Seller represents that they:'},{l:['do not conceal known material information','allow inspection prior to closing']}]},
+        {n:'VII',t:'ACCESS TO THE PROPERTY',blocks:[{p:'Buyer shall have reasonable access for:'},{l:['inspections','evaluations','necessary visits']},{p:'All access shall be coordinated with Seller.'}]},
+        {n:'VIII',t:'RIGHT OF ASSIGNMENT',blocks:[{p:'Buyer shall have the right to:'},{l:['assign','transfer','designate']},{p:'Buyer’s contractual position without further approval from Seller.'},{p:'Seller acknowledges that:'},{l:['the party closing may differ from the original Buyer']}]},
+        {n:'IX',t:'CLOSING',blocks:[{p:'The estimated closing date shall be: [CLOSING_DATE].'},{p:'Closing may be extended by mutual agreement.'}]},
+        {n:'X',t:'CLOSING COSTS',blocks:[{p:'Closing costs shall be borne by:'},{l:['☐ Buyer','☐ Seller','☐ Both parties']}]},
+        {n:'XI',t:'DEFAULT',blocks:[{p:'If Buyer defaults:'},{l:['Buyer shall forfeit the deposit']},{p:'If Seller defaults:'},{l:['Seller shall return any amount received','Seller may be subject to additional actions']}]},
+        {n:'XII',t:'DISPUTE RESOLUTION',blocks:[{p:'The parties agree to:'},{l:['Attempt mediation first.','If unresolved, arbitration in Puerto Rico.']}]},
+        {n:'XIII',t:'AMENDMENTS',blocks:[{p:'Any change must:'},{l:['be in writing','be signed by both parties']}]},
+        {n:'XIV',t:'NATURE OF THE DOCUMENT',blocks:[{p:'This document establishes a binding agreement.'},{p:'Each party acknowledges that they:'},{l:['have read the content','understand the terms','act upon their own judgment']}]},
+        {n:'XV',t:'ENTIRE AGREEMENT',blocks:[{p:'This document represents the entire agreement.'}]},
+        {n:'XVI',t:'SIGNATURES',blocks:[{s:[{label:'Seller',name:true},{label:'Buyer',name:true},{label:'Witness (Optional)',name:true}]}]}
+      ]
+    }
+  },
+  assignment: {
+    es: {
+      title: 'CONTRATO DE ASIGNACIÓN',
+      sections: [
+        {n:'I',t:'PARTES DEL CONTRATO',blocks:[{l:['Wholesaler: [NOMBRE_DEL_WHOLESALER]','Comprador Final: [NOMBRE_DEL_COMPRADOR_FINAL]']},{p:'Ambas partes acuerdan lo siguiente:'}]},
+        {n:'II',t:'REFERENCIA AL CONTRATO ORIGINAL',blocks:[{p:'Este Contrato asigna los derechos del Contrato de Compra-Venta firmado el [DIA] de [MES] del año [AÑO] entre las siguientes partes:'},{l:['Nombre del Vendedor: [NOMBRE_DEL_VENDEDOR]','Nombre del Wholesaler: [NOMBRE_DEL_WHOLESALER]','Dirección de la Propiedad: [DIRECCION_DE_LA_PROPIEDAD]']}]},
+        {n:'III',t:'ASSIGNMENT FEE',blocks:[{p:'El Comprador Final acepta pagar al Wholesaler la suma de USD $[ASSIGNMENT_FEE_TOTAL] como cuota de asignación (Assignment Fee), desglosada de la siguiente manera:'},{l:['Depósito Inicial: USD $[ASSIGNMENT_FEE_INICIAL], pagado dentro de [DIAS_DEPOSITO_INICIAL] días tras la firma.','Pago Final: USD $[ASSIGNMENT_FEE_FINAL], pagado en la fecha de cierre.']}]},
+        {n:'IV',t:'DECLARACIONES DEL COMPRADOR FINAL',blocks:[{p:'El Comprador Final declara y garantiza:'},{l:['Poseer los fondos necesarios para completar la transacción.','Aceptar la propiedad en su condición actual (“As Is”).','Conocer y aceptar los términos del Contrato de Compra-Venta original.']}]},
+        {n:'V',t:'PROTECCIÓN PARA EL WHOLESALER',blocks:[{l:['El Comprador Final no podrá negociar directamente con el Vendedor sin la autorización del Wholesaler.','Cualquier intento de eludir al Wholesaler resultará en la anulación del contrato y aplicación de penalidades.']}]},
+        {n:'VI',t:'CLÁUSULA DE CONTINGENCIA',blocks:[{p:'El Earnest Money no reembolsable sólo se hará efectivo tras la finalización y aceptación del período de inspección.'}]},
+        {n:'VII',t:'RESOLUCIÓN DE DISPUTAS',blocks:[{p:'Las disputas se gestionarán inicialmente mediante mediación. De no lograrse acuerdo, podrán recurrir a arbitraje conforme a las leyes aplicables en Puerto Rico.'}]},
+        {n:'VIII',t:'MODIFICACIONES AL CONTRATO',blocks:[{p:'Cualquier modificación deberá realizarse por escrito y ser firmada por ambas partes para ser válida.'}]},
+        {n:'IX',t:'CONFIRMACIÓN DE DEPÓSITO',blocks:[{p:'El Comprador Final confirma la entrega del Earnest Money de USD $[MONTO_EMD] como muestra de compromiso. Este depósito es independiente del Assignment Fee.'}]},
+        {n:'X',t:'FIRMAS',blocks:[{s:[{label:'Wholesaler'},{label:'Comprador Final'},{label:'Testigo 1'},{label:'Testigo 2'}]}]}
+      ]
+    },
+    en: {
+      title: 'ASSIGNMENT AGREEMENT',
+      sections: [
+        {n:'I',t:'PARTIES',blocks:[{l:['Wholesaler: [WHOLESALER_NAME]','End Buyer: [END_BUYER_NAME]']},{p:'Both parties agree to the following:'}]},
+        {n:'II',t:'REFERENCE TO ORIGINAL CONTRACT',blocks:[{p:'This Contract assigns the rights of the Purchase & Sale Agreement signed on [DAY]/[MONTH]/[YEAR] between:'},{l:['Seller: [SELLER_NAME]','Wholesaler: [WHOLESALER_NAME]','Property Address: [PROPERTY_ADDRESS]']}]},
+        {n:'III',t:'ASSIGNMENT FEE',blocks:[{p:'End Buyer agrees to pay Wholesaler the sum of USD $[ASSIGNMENT_FEE_TOTAL] as Assignment Fee, broken down as follows:'},{l:['Initial Deposit: USD $[ASSIGNMENT_FEE_INITIAL], paid within [INITIAL_DEPOSIT_DAYS] days after signing.','Final Payment: USD $[ASSIGNMENT_FEE_FINAL], paid on closing date.']}]},
+        {n:'IV',t:'END BUYER REPRESENTATIONS',blocks:[{p:'End Buyer represents and warrants:'},{l:['To possess necessary funds to complete the transaction.','To accept the property “As Is”.','To know and accept the terms of the original Purchase & Sale Agreement.']}]},
+        {n:'V',t:'WHOLESALER PROTECTION',blocks:[{l:['End Buyer may not negotiate directly with Seller without Wholesaler authorization.','Any attempt to circumvent shall result in contract voidance and penalties.']}]},
+        {n:'VI',t:'CONTINGENCY CLAUSE',blocks:[{p:'The non-refundable Earnest Money becomes effective only after completion and acceptance of the inspection period.'}]},
+        {n:'VII',t:'DISPUTE RESOLUTION',blocks:[{p:'Disputes handled initially through mediation. If unresolved, arbitration under applicable laws in Puerto Rico.'}]},
+        {n:'VIII',t:'AMENDMENTS',blocks:[{p:'Any modification must be in writing and signed by both parties to be valid.'}]},
+        {n:'IX',t:'DEPOSIT CONFIRMATION',blocks:[{p:'End Buyer confirms delivery of Earnest Money of USD $[EMD_AMOUNT] as a sign of commitment. This deposit is independent of the Assignment Fee.'}]},
+        {n:'X',t:'SIGNATURES',blocks:[{s:[{label:'Wholesaler'},{label:'End Buyer'},{label:'Witness 1'},{label:'Witness 2'}]}]}
+      ]
+    }
+  }
+};
+
+const CONTRACT_META = [
+  {id:'cash',es:{t:'Contrato de Promesa de Compraventa',s:'Contrato principal de compra en efectivo. EMD, inspección, cesión, arbitraje en PR.'},en:{t:'Purchase & Sale Agreement',s:'Primary cash purchase contract. Deposit, inspection, assignment, PR arbitration.'}},
+  {id:'assignment',es:{t:'Contrato de Asignación',s:'Cesión del Contrato de Compraventa al comprador final con assignment fee desglosado.'},en:{t:'Assignment Agreement',s:'Assignment of the P&S Agreement to end buyer with itemized assignment fee.'}}
+];
+
+/* LETTER TEMPLATES */
+const MAIL_TYPES = {
+  probate: {es:'Sucesión (probate)',en:'Probate'},
+  preforeclosure: {es:'Pre-ejecución hipotecaria',en:'Pre-foreclosure'},
+  tired: {es:'Casero cansado',en:'Tired landlord'},
+  vacant: {es:'Propiedad vacante',en:'Vacant property'},
+  absentee: {es:'Dueño ausente',en:'Absentee owner'},
+  taxes: {es:'Atraso de impuestos',en:'Tax delinquent'}
+};
+
+const MAIL_TEMPLATES = {
+  probate: {
+    es: (o,a,me)=>`Estimado/a ${o||'[Nombre del dueño]'}:\n\nMi nombre es ${me||'[Tu nombre]'}. Lamento sinceramente la pérdida en su familia. Le escribo porque entiendo que la propiedad en ${a||'[Dirección]'} está pasando por el proceso de sucesión.\n\nSé que es un momento difícil y manejar bienes raíces durante una sucesión puede ser abrumador. Soy un comprador local en efectivo y ofrezco:\n\n  • Compra rápida y discreta\n  • Sin comisiones de agente\n  • Sin necesidad de reparaciones (compro tal como está)\n  • Cierre en su tiempo, no el mío\n\nSi tiene un momento, llámeme o envíeme un mensaje al ${me?me.split('·')[1]||'[teléfono]':'[teléfono]'}. No hay ninguna obligación.\n\nCon respeto,\n${me||'[Tu nombre]'}`,
+    en: (o,a,me)=>`Dear ${o||'[Owner name]'}:\n\nMy name is ${me||'[Your name]'}. I am sincerely sorry for the loss in your family. I am writing because I understand the property at ${a||'[Address]'} is going through probate.\n\nI know this is a difficult time and managing real estate during probate can be overwhelming. I am a local cash buyer and offer:\n\n  • Fast and discreet purchase\n  • No agent commissions\n  • No repairs needed (I buy as-is)\n  • Close on your timeline, not mine\n\nIf you have a moment, call or text me at ${me?me.split('·')[1]||'[phone]':'[phone]'}. No obligation whatsoever.\n\nWith respect,\n${me||'[Your name]'}`
+  },
+  preforeclosure: {
+    es: (o,a,me)=>`Estimado/a ${o||'[Nombre del dueño]'}:\n\nMi nombre es ${me||'[Tu nombre]'} y soy un inversionista local. Le escribo respecto a la propiedad en ${a||'[Dirección]'}.\n\nEntiendo que la situación es delicada. He ayudado a muchas familias a evitar la ejecución hipotecaria y proteger su crédito. Puedo ofrecer:\n\n  • Pago en efectivo rápido\n  • Cierre en 7 a 14 días\n  • Cubro los costos del cierre\n  • Sin reparaciones — compro tal como está\n\nEl tiempo es importante. Llámeme o envíeme texto: ${me?me.split('·')[1]||'[teléfono]':'[teléfono]'}.\n\nConfidencial. Sin obligación.\n\n${me||'[Tu nombre]'}`,
+    en: (o,a,me)=>`Dear ${o||'[Owner name]'}:\n\nMy name is ${me||'[Your name]'} and I am a local investor. I am writing regarding the property at ${a||'[Address]'}.\n\nI understand the situation is delicate. I have helped many families avoid foreclosure and protect their credit. I can offer:\n\n  • Quick cash payment\n  • Close in 7 to 14 days\n  • I cover closing costs\n  • No repairs — buying as-is\n\nTime matters. Call or text me: ${me?me.split('·')[1]||'[phone]':'[phone]'}.\n\nConfidential. No obligation.\n\n${me||'[Your name]'}`
+  },
+  tired: {
+    es: (o,a,me)=>`Hola ${o||'[Nombre]'}:\n\nSoy ${me||'[Tu nombre]'}, inversionista local. Le escribo sobre la propiedad en ${a||'[Dirección]'}.\n\n¿Cansado de inquilinos que no pagan? ¿Reparaciones que nunca terminan? ¿Llamadas en plena madrugada?\n\nCompro propiedades de renta en efectivo:\n\n  • Sin comisiones\n  • Sin inspecciones complicadas\n  • Cierro en 14 días o menos\n  • Compro tal como está, con inquilinos o sin ellos\n\nSi está listo para terminar el dolor de cabeza, llámeme: ${me?me.split('·')[1]||'[teléfono]':'[teléfono]'}.\n\nGracias por su tiempo,\n${me||'[Tu nombre]'}`,
+    en: (o,a,me)=>`Hi ${o||'[Name]'}:\n\nI’m ${me||'[Your name]'}, a local investor. Writing about the property at ${a||'[Address]'}.\n\nTired of tenants who don’t pay? Repairs that never end? Midnight phone calls?\n\nI buy rental properties for cash:\n\n  • No commissions\n  • No complicated inspections\n  • Close in 14 days or less\n  • Buy as-is, with or without tenants\n\nReady to end the headache? Call me: ${me?me.split('·')[1]||'[phone]':'[phone]'}.\n\nThanks for your time,\n${me||'[Your name]'}`
+  },
+  vacant: {
+    es: (o,a,me)=>`Estimado/a ${o||'[Nombre del dueño]'}:\n\nNoté que la propiedad en ${a||'[Dirección]'} ha estado vacía. Soy ${me||'[Tu nombre]'}, comprador local en efectivo.\n\nUna casa vacía cuesta dinero cada mes — impuestos, seguros, mantenimiento. ¿Estaría dispuesto/a a vender?\n\nOfrezco:\n\n  • Efectivo, sin financiamiento\n  • Compro tal como está — sin reparaciones\n  • Cierro en 7 a 14 días\n  • Sin comisiones\n\nSi le interesa, llámeme o envíeme texto: ${me?me.split('·')[1]||'[teléfono]':'[teléfono]'}.\n\nSin obligación,\n${me||'[Tu nombre]'}`,
+    en: (o,a,me)=>`Dear ${o||'[Owner]'}:\n\nI noticed the property at ${a||'[Address]'} has been vacant. I’m ${me||'[Your name]'}, a local cash buyer.\n\nAn empty house costs money each month — taxes, insurance, maintenance. Would you consider selling?\n\nI offer:\n\n  • Cash, no financing\n  • Buy as-is — no repairs\n  • Close in 7 to 14 days\n  • No commissions\n\nIf interested, call or text: ${me?me.split('·')[1]||'[phone]':'[phone]'}.\n\nNo obligation,\n${me||'[Your name]'}`
+  },
+  absentee: {
+    es: (o,a,me)=>`Hola ${o||'[Nombre]'}:\n\nSoy ${me||'[Tu nombre]'}, inversionista local. Le escribo respecto a su propiedad en ${a||'[Dirección]'}.\n\nManejar una propiedad desde lejos es complicado. Si está considerando venderla, soy un comprador serio en efectivo.\n\n  • Pago en efectivo\n  • Sin reparaciones — compro tal como está\n  • Cierro en 14 días o menos\n  • Manejo todo el papeleo a distancia\n\nUna llamada de 5 minutos puede ahorrarle meses de gestión. ${me?me.split('·')[1]||'[teléfono]':'[teléfono]'}.\n\nGracias,\n${me||'[Tu nombre]'}`,
+    en: (o,a,me)=>`Hi ${o||'[Name]'}:\n\nI’m ${me||'[Your name]'}, a local investor. I am reaching out about your property at ${a||'[Address]'}.\n\nManaging a property from a distance is complicated. If you are considering selling, I’m a serious cash buyer.\n\n  • Cash payment\n  • No repairs — buying as-is\n  • Close in 14 days or less\n  • I handle paperwork remotely\n\nA 5-minute call could save you months of management. ${me?me.split('·')[1]||'[phone]':'[phone]'}.\n\nThanks,\n${me||'[Your name]'}`
+  },
+  taxes: {
+    es: (o,a,me)=>`Estimado/a ${o||'[Nombre]'}:\n\nSoy ${me||'[Tu nombre]'}, inversionista local. Le escribo respecto a la propiedad en ${a||'[Dirección]'}.\n\nLos impuestos atrasados pueden poner una propiedad en riesgo. He ayudado a otros propietarios a resolver esta situación sin pérdida total.\n\nPuedo ofrecer:\n\n  • Efectivo para liquidar los impuestos\n  • Compra rápida y discreta\n  • Sin reparaciones\n  • Cierre en 7 a 14 días\n\nLlámeme o envíeme texto, sin compromiso: ${me?me.split('·')[1]||'[teléfono]':'[teléfono]'}.\n\nConfidencial,\n${me||'[Tu nombre]'}`,
+    en: (o,a,me)=>`Dear ${o||'[Name]'}:\n\nI’m ${me||'[Your name]'}, a local investor. Writing about the property at ${a||'[Address]'}.\n\nDelinquent taxes can put a property at risk. I’ve helped other owners resolve this situation without total loss.\n\nI can offer:\n\n  • Cash to clear back taxes\n  • Quick discreet purchase\n  • No repairs\n  • Close in 7 to 14 days\n\nCall or text, no obligation: ${me?me.split('·')[1]||'[phone]':'[phone]'}.\n\nConfidential,\n${me||'[Your name]'}`
+  }
+};
+
+/* SCRIPT TEMPLATES */
+const SCRIPT_TYPES = {
+  absentee: {es:'Dueño ausente',en:'Absentee owner'},
+  probate: {es:'Sucesión',en:'Probate'},
+  preforeclosure: {es:'Pre-ejecución',en:'Pre-foreclosure'},
+  tired: {es:'Casero cansado',en:'Tired landlord'},
+  fsbo: {es:'FSBO',en:'FSBO'},
+  vacant: {es:'Vacante',en:'Vacant'}
+};
+const TONES = {consult:{es:'Consultivo',en:'Consultative'},direct:{es:'Directo',en:'Direct'}};
+
+const SCRIPTS = {
+  absentee: {
+    consult: {
+      es:`APERTURA\n"Hola, ¿hablo con [nombre]? Soy [tu nombre], inversionista local. Te llamo porque vi que eres dueño de la propiedad en [dirección] pero no vives ahí. ¿Tienes un minuto?"\n\nQUALIFICAR\n"¿Tienes la propiedad rentada o está vacía?"\n"¿Cuánto tiempo llevas siendo dueño?"\n"¿Has pensado en venderla en algún momento?"\n\nMOTIVACIÓN\n"Si recibieras la oferta correcta, ¿qué precio te haría considerarlo?"\n"¿Qué te detiene de venderla hoy?"\n\nOFERTA\n"Basado en lo que me dices, podría ofrecer entre [rango]. ¿Eso funcionaría?"\n\nOBJECIONES\n• 'Vale más' → "Entiendo. ¿Qué números has visto? Te muestro mis comps."\n• 'Necesito pensarlo' → "Sin problema. ¿Te llamo el lunes o miércoles?"\n• 'No tengo prisa' → "Perfecto. ¿En qué punto te gustaría venderla?"\n\nCIERRE\n"¿Te parece si paso a verla mañana? Me toma 15 minutos."`,
+      en:`OPENING\n"Hi, is this [name]? My name is [your name], local investor. Calling because I saw you own the property at [address] but don’t live there. Got a minute?"\n\nQUALIFY\n"Is it rented or vacant?"\n"How long have you owned it?"\n"Have you ever thought about selling?"\n\nMOTIVATION\n"If you got the right offer, what number would make you consider it?"\n"What’s keeping you from selling today?"\n\nOFFER\n"Based on what you’re telling me, I could offer between [range]. Would that work?"\n\nOBJECTIONS\n• 'It’s worth more' → "Understood. What comps have you seen? Let me share mine."\n• 'Need to think' → "No problem. Should I call Monday or Wednesday?"\n• 'No rush' → "Perfect. At what point would you want to sell?"\n\nCLOSE\n"How about I swing by tomorrow? 15 minutes."`
+    },
+    direct: {
+      es:`"[Nombre], soy [tu nombre]. Vi que eres dueño de [dirección]. ¿Vendes?"\n\nSi sí → "¿Cuánto?"\nSi no → "¿Por qué precio sí venderías?"\n\nResponde el número.\n\nSi acepta → "Genial. ¿Mañana a las 3pm para verla?"\nSi rechaza → "Si cambias de idea, llámame. ¿OK?"`,
+      en:`"[Name], it’s [your name]. Saw you own [address]. Selling?"\n\nIf yes → "How much?"\nIf no → "What price would make you sell?"\n\nGive the number.\n\nIf accept → "Great. Tomorrow 3pm to see it?"\nIf reject → "If you change your mind, call me. OK?"`
+    }
+  },
+  probate: {
+    consult: {
+      es:`APERTURA\n"Hola, ¿es [nombre]? Soy [tu nombre], comprador local. Primero, lamento la pérdida en tu familia. Te llamo respecto a la propiedad en [dirección]. ¿Es buen momento para hablar 2 minutos?"\n\nEMPATÍA\n"Lidiar con una sucesión es complicado. ¿Cómo va el proceso para ustedes?"\n\nQUALIFICAR\n"¿Quién más en la familia está involucrado?"\n"¿Ya hablaron de qué hacer con la propiedad?"\n"¿Tienen plan de venderla, rentarla o quedársela?"\n\nMOTIVACIÓN\n"Si pudiéramos cerrar rápido y sin reparaciones, ¿sería de ayuda?"\n\nOFERTA\n"Compro propiedades como esta en efectivo, sin comisiones, en su condición actual. ¿Te puedo enviar una oferta esta semana?"\n\nCIERRE\n"¿Cuándo es bueno que pase a verla? La inspección la hago yo."`,
+      en:`OPENING\n"Hi, is this [name]? I’m [your name], local buyer. First, I’m sorry for the loss in your family. Calling about the property at [address]. Got 2 minutes?"\n\nEMPATHY\n"Dealing with probate is complicated. How is the process going for you?"\n\nQUALIFY\n"Who else in the family is involved?"\n"Have you discussed what to do with the property?"\n"Plan to sell, rent, or keep?"\n\nMOTIVATION\n"If we could close fast with no repairs, would that help?"\n\nOFFER\n"I buy properties like this in cash, no commissions, as-is. Can I send an offer this week?"\n\nCLOSE\n"When works to swing by? I handle inspection myself."`
+    },
+    direct: {
+      es:`"Hola [nombre], soy [tu nombre]. Lamento la pérdida. ¿Venden la casa de [dirección]?"\n\nSi sí → "¿Cuánto piden?"\nSi no → "Cuando estén listos, llámenme. Pago en efectivo."`,
+      en:`"Hi [name], [your name]. Sorry for your loss. Selling the house at [address]?"\n\nIf yes → "How much asking?"\nIf no → "When you’re ready, call me. Cash."`
+    }
+  },
+  preforeclosure: {
+    consult: {
+      es:`APERTURA\n"Hola, ¿hablo con [nombre]? Soy [tu nombre]. Te llamo porque tengo información que podría ayudarte respecto a [dirección]. ¿Tienes un par de minutos?"\n\nEMPATÍA\n"Sé que estás en una situación difícil. He ayudado a varias familias en lo mismo. Mi meta es ayudarte a proteger tu crédito."\n\nQUALIFICAR\n"¿Cuánto debes en la hipoteca?"\n"¿Cuántos meses estás atrás?"\n"¿Tienes contacto con el banco?"\n\nSOLUCIÓN\n"Tengo dos formas de ayudarte: 1) compro la propiedad en efectivo, pago tu deuda; 2) si hay equity, te doy efectivo extra al cierre. ¿Cuál suena mejor?"\n\nCIERRE\n"El tiempo cuenta. ¿Paso hoy o mañana?"`,
+      en:`OPENING\n"Hi, is this [name]? I’m [your name]. I’m calling because I have information that could help you about [address]. Couple minutes?"\n\nEMPATHY\n"I know you’re in a tough spot. I’ve helped families in the same situation. My goal is to help you protect your credit."\n\nQUALIFY\n"How much do you owe on the mortgage?"\n"How many months behind?"\n"In contact with the bank?"\n\nSOLUTION\n"Two ways I can help: 1) buy in cash and pay off your debt; 2) if there’s equity, extra cash at closing. Which sounds better?"\n\nCLOSE\n"Time matters. Today or tomorrow?"`
+    },
+    direct: {
+      es:`"[Nombre], soy [tu nombre]. Sé que estás atrás en pagos en [dirección]. Tengo dinero en efectivo y puedo cerrar en 7 días. ¿Hablamos?"`,
+      en:`"[Name], it’s [your name]. I know you’re behind on payments at [address]. I have cash and can close in 7 days. Want to talk?"`
+    }
+  },
+  tired: {
+    consult: {
+      es:`APERTURA\n"Hola [nombre], soy [tu nombre]. Eres dueño de [dirección]. Imagino que ser casero tiene sus retos. ¿Te dejo preguntar algo?"\n\nDOLOR\n"¿Cuál es el mayor dolor de cabeza con esa propiedad?"\n"¿Cuándo fue la última vez que entró en mente venderla?"\n"Si pudieras venderla mañana, sin agente, sin reparaciones — ¿lo considerarías?"\n\nOFERTA\n"Compro propiedades con inquilinos adentro, sin inspección complicada. En efectivo. ¿Qué precio te haría considerarlo?"\n\nCIERRE\n"¿Cuándo paso a verla?"`,
+      en:`OPENING\n"Hi [name], [your name]. You own [address]. Bet being a landlord has its challenges. Mind if I ask something?"\n\nPAIN\n"What’s the biggest headache with that property?"\n"When was the last time selling crossed your mind?"\n"If you could sell tomorrow — no agent, no repairs — would you consider?"\n\nOFFER\n"I buy properties with tenants inside, no complicated inspection. Cash. What price would make you consider?"\n\nCLOSE\n"When do I swing by?"`
+    },
+    direct: {
+      es:`"[Nombre], ¿cansado de los inquilinos en [dirección]? Pago en efectivo, cierro en 14 días, sin reparaciones. ¿Cuánto quieres?"`,
+      en:`"[Name], tired of tenants at [address]? Cash, close in 14 days, no repairs. How much do you want?"`
+    }
+  },
+  fsbo: {
+    consult: {
+      es:`APERTURA\n"Hola, vi tu anuncio de [dirección]. Soy [tu nombre], inversionista local. ¿Sigues vendiendo?"\n\nQUALIFICAR\n"¿Cuánto pides?"\n"¿Cuánto tiempo llevas en venta?"\n"¿Has tenido ofertas?"\n"¿Por qué decidiste venderla?"\n\nVALOR\n"Soy comprador serio en efectivo — sin financiamiento, sin agentes, sin reparaciones. Mi oferta sería más baja, pero el cierre es rápido y seguro."\n\nCIERRE\n"¿Puedo verla esta semana?"`,
+      en:`OPENING\n"Hi, saw your listing at [address]. I’m [your name], local investor. Still selling?"\n\nQUALIFY\n"Asking price?"\n"How long on market?"\n"Had any offers?"\n"Why selling?"\n\nVALUE\n"I’m a serious cash buyer — no financing, no agents, no repairs. My offer is lower, but closing is fast and certain."\n\nCLOSE\n"Can I see it this week?"`
+    },
+    direct: {
+      es:`"Vi tu casa en [dirección]. ¿Cuánto pides? Pago efectivo."`,
+      en:`"Saw your house at [address]. How much? Cash."`
+    }
+  },
+  vacant: {
+    consult: {
+      es:`APERTURA\n"Hola [nombre], soy [tu nombre]. Noté que [dirección] ha estado vacía un tiempo. ¿Tienes planes para ella?"\n\nQUALIFICAR\n"¿Por qué está vacía?"\n"¿Cuánto tiempo lleva así?"\n"¿Sigue costándote impuestos y seguros?"\n\nDOLOR\n"Una casa vacía es un drain. ¿Cuál era el plan original?"\n\nOFERTA\n"Yo me la quito de las manos. Efectivo, sin reparaciones, cierre en 14 días."\n\nCIERRE\n"¿Cuándo paso?"`,
+      en:`OPENING\n"Hi [name], [your name]. Noticed [address] has been vacant a while. Plans for it?"\n\nQUALIFY\n"Why is it vacant?"\n"How long?"\n"Still costing you taxes and insurance?"\n\nPAIN\n"An empty house is a drain. What was the original plan?"\n\nOFFER\n"I’ll take it off your hands. Cash, no repairs, close in 14 days."\n\nCLOSE\n"When do I come by?"`
+    },
+    direct: {
+      es:`"Tu casa en [dirección] está vacía. Te la compro en efectivo. ¿Cuánto?"`,
+      en:`"Your house at [address] is vacant. I’ll buy cash. How much?"`
+    }
+  }
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let LANG = 'es';
+let ARV_COMPS = [
+  {address:'123 Main St',soldPrice:220000,sqft:1180},
+  {address:'456 Oak Ave',soldPrice:245000,sqft:1260},
+  {address:'789 Pine Rd',soldPrice:210000,sqft:1140}
+];
+let DICT_FILTER = 'all';
+let DICT_QUERY = '';
+let PIPELINE = loadJSON('jdps.pipeline.v1', []);
+let BUYERS = loadJSON('jdps.buyers.v1', []);
+let DEAL_EDIT_ID = null;
+let BUYER_EDIT_ID = null;
+
+const STAGES = {
+  prospecto: {es:'Prospecto',en:'Prospect'},
+  bajo_contrato: {es:'Bajo Contrato',en:'Under Contract'},
+  asignado: {es:'Asignado',en:'Assigned'},
+  cerrado: {es:'Cerrado',en:'Closed'}
+};
+
+function loadJSON(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+/* ============================================================
+   I18N + NAVIGATION
+   ============================================================ */
+function setLang(l){LANG=l;document.documentElement.setAttribute('lang',l);document.getElementById('lang-es').setAttribute('aria-pressed',String(l==='es'));document.getElementById('lang-en').setAttribute('aria-pressed',String(l==='en'));try{localStorage.setItem('jdps.lang',l)}catch(e){}refreshAll()}
+function refreshAll(){renderMortgage();renderArv();renderFixFlip();renderDictChips();renderDict();renderContracts();renderKanban();renderBuyersList();renderSkip();renderMail();renderScript();populateSelects()}
+function showPage(p){document.querySelectorAll('.page').forEach(el=>el.classList.toggle('active',el.dataset.page===p));document.querySelectorAll('.tab-btn').forEach(b=>b.setAttribute('aria-current',String(b.dataset.tab===p)));window.scrollTo({top:0,behavior:'smooth'})}
+function showSub(page,sub){document.querySelectorAll('[data-page="'+page+'"] .sub').forEach(el=>el.classList.toggle('active',el.dataset.sub===sub));document.querySelectorAll('[data-sub-nav="'+page+'"] button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sub===sub)))}
+
+/* ============================================================
+   FORMATTERS
+   ============================================================ */
+function fmtCurrency(v,opts){const locale=LANG==='en'?'en-US':'es-US';return new Intl.NumberFormat(locale,{style:'currency',currency:'USD',maximumFractionDigits:0,...(opts||{})}).format(v||0)}
+
+/* ============================================================
+   CALCULATORS
+   ============================================================ */
+function calcMortgage(){const loan=+document.getElementById('m-loan').value,rate=+document.getElementById('m-rate').value,term=+document.getElementById('m-term').value;if(!loan||!rate||!term)return null;const n=term*12,r=rate/100/12;const m=r===0?loan/n:(loan*(r*Math.pow(1+r,n)))/(Math.pow(1+r,n)-1);let bal=loan;const sched=[];for(let i=1;i<=12&&i<=n;i++){const int=bal*r,pri=m-int;bal=Math.max(0,bal-pri);sched.push({m:i,int,pri,bal})}return{monthly:m,totalInterest:m*n-loan,totalPaid:m*n,sched}}
+function renderMortgage(){const r=calcMortgage(),el=document.getElementById('m-results');if(!r){el.innerHTML='<p class="muted small">'+(LANG==='en'?'Enter loan details.':'Ingresa los datos del préstamo.')+'</p>';return}el.innerHTML=`<div class="result emphasis"><div><div class="result-label">${LANG==='en'?'Monthly payment (P&I)':'Pago mensual (P&I)'}</div></div><div class="result-value">${fmtCurrency(r.monthly,{maximumFractionDigits:2})}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Total interest paid':'Interés total a pagar'}</div><div class="result-value">${fmtCurrency(r.totalInterest)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Total paid':'Total pagado'}</div><div class="result-value">${fmtCurrency(r.totalPaid)}</div></div><div class="divider mt-3">${LANG==='en'?'Amortization — first 12 months':'Amortización — primeros 12 meses'}</div><table class="tab"><thead><tr><th>${LANG==='en'?'Month':'Mes'}</th><th class="num">${LANG==='en'?'Interest':'Interés'}</th><th class="num">${LANG==='en'?'Principal':'Principal'}</th><th class="num">${LANG==='en'?'Balance':'Saldo'}</th></tr></thead><tbody>${r.sched.map(s=>`<tr><td class="muted">${s.m}</td><td class="num">${fmtCurrency(s.int)}</td><td class="num">${fmtCurrency(s.pri)}</td><td class="num">${fmtCurrency(s.bal)}</td></tr>`).join('')}</tbody></table>`}
+['m-loan','m-rate','m-term'].forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)renderMortgage()}));
+
+function calcArv(){const sqft=+document.getElementById('arv-sqft').value;const valid=ARV_COMPS.filter(c=>c.sqft>0&&c.soldPrice>0);if(!sqft||!valid.length)return null;const perComp=valid.map(c=>({address:c.address,ppsf:c.soldPrice/c.sqft}));const avg=perComp.reduce((s,c)=>s+c.ppsf,0)/perComp.length;const totalP=valid.reduce((s,c)=>s+c.soldPrice,0),totalS=valid.reduce((s,c)=>s+c.sqft,0);const w=totalP/totalS;return{avg,w,arv:sqft*w,low:sqft*Math.min(...perComp.map(c=>c.ppsf)),high:sqft*Math.max(...perComp.map(c=>c.ppsf)),perComp}}
+function renderArv(){const r=calcArv(),resEl=document.getElementById('arv-results'),compsEl=document.getElementById('arv-comps');compsEl.innerHTML=ARV_COMPS.map((c,i)=>`<div class="comp-row"><div class="field"><label>${LANG==='en'?'Address':'Dirección'} ${i+1}</label><input class="input" value="${escapeAttr(c.address)}" oninput="updateComp(${i},'address',this.value)"/></div><div class="field"><label>${LANG==='en'?'Sold price':'Precio vendido'}</label><div class="input-wrap has-prefix"><span class="prefix">$</span><input class="input num" type="number" value="${c.soldPrice||''}" oninput="updateComp(${i},'soldPrice',+this.value)"/></div></div><div class="field"><label>${LANG==='en'?'Sqft':'Pies²'}</label><div class="input-wrap has-suffix"><input class="input num" type="number" value="${c.sqft||''}" oninput="updateComp(${i},'sqft',+this.value)"/><span class="suffix">ft²</span></div></div><div><button class="remove-btn" onclick="removeComp(${i})">✕ ${LANG==='en'?'Remove':'Quitar'}</button></div></div>`).join('');if(!r){resEl.innerHTML='<p class="muted small">'+(LANG==='en'?'Enter subject sqft and at least one comp.':'Ingresa pies² del sujeto y al menos un comparable.')+'</p>';return}resEl.innerHTML=`<div class="result emphasis"><div><div class="result-label">${LANG==='en'?'Estimated ARV':'ARV estimado'}</div></div><div class="result-value">${fmtCurrency(r.arv)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'ARV range':'Rango ARV'}</div><div class="result-value">${fmtCurrency(r.low)} – ${fmtCurrency(r.high)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Average $/sqft':'Promedio $/ft²'}</div><div class="result-value">${fmtCurrency(r.avg,{maximumFractionDigits:2})}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Weighted $/sqft':'Ponderado $/ft²'}</div><div class="result-value">${fmtCurrency(r.w,{maximumFractionDigits:2})}</div></div><p class="eyebrow mt-3">${LANG==='en'?'$/sqft per comp':'$/ft² por comp'}</p><table class="tab mt-1"><tbody>${r.perComp.map((c,i)=>`<tr><td>${escapeHtml(c.address)||(LANG==='en'?'Comp ':'Comp ')+(i+1)}</td><td class="num">${fmtCurrency(c.ppsf,{maximumFractionDigits:2})}</td></tr>`).join('')}</tbody></table>`}
+function updateComp(i,k,v){ARV_COMPS[i][k]=v;renderArv()}
+function removeComp(i){ARV_COMPS.splice(i,1);renderArv()}
+function addComp(){ARV_COMPS.push({address:'',soldPrice:0,sqft:0});renderArv()}
+document.addEventListener('input',e=>{if(e.target.id==='arv-sqft')renderArv()});
+
+function calcFixFlip(){const arv=+document.getElementById('ff-arv').value,rehab=+document.getElementById('ff-rehab').value,purchase=+document.getElementById('ff-purchase').value,holding=+document.getElementById('ff-holding').value,sell=+document.getElementById('ff-selling').value,rule=+document.getElementById('ff-rule').value;if(!arv)return null;const mao=arv*(rule/100)-rehab;const sellCost=arv*(sell/100);const inv=purchase+rehab+holding+sellCost;const profit=arv-inv;return{mao,sellCost,inv,profit,roi:inv>0?profit/inv*100:0,margin:mao-purchase}}
+function renderFixFlip(){const r=calcFixFlip(),el=document.getElementById('ff-results');if(!r){el.innerHTML='<p class="muted small">'+(LANG==='en'?'Enter ARV to evaluate.':'Ingresa el ARV para evaluar.')+'</p>';return}const pos=r.profit>0;el.innerHTML=`<div class="result emphasis"><div><div class="result-label">MAO — ${LANG==='en'?'Maximum Allowable Offer':'Máxima Oferta Permitida'}</div></div><div class="result-value">${fmtCurrency(r.mao)}</div></div><div class="result"><div><div class="result-label">${LANG==='en'?'Margin vs. purchase':'Margen vs. compra'}</div><span class="result-hint">${LANG==='en'?'MAO minus your purchase. Positive = available margin.':'MAO menos tu compra. Positivo = margen disponible.'}</span></div><div class="result-value">${fmtCurrency(r.margin)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Estimated profit':'Ganancia estimada'}</div><div class="result-value">${fmtCurrency(r.profit)}</div></div><div class="result"><div class="result-label">ROI</div><div class="result-value">${r.roi.toFixed(1)}%</div></div><div class="result"><div class="result-label">${LANG==='en'?'Computed selling cost':'Costo de venta calculado'}</div><div class="result-value">${fmtCurrency(r.sellCost)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Total invested':'Total invertido'}</div><div class="result-value">${fmtCurrency(r.inv)}</div></div><div class="callout" style="border-color:${pos?'var(--clay)':'var(--muted)'}"><p class="eyebrow">${pos?(LANG==='en'?'Deal profile':'Perfil del negocio'):(LANG==='en'?'Caution':'Precaución')}</p><p style="margin:0;font-size:.875rem">${pos?(LANG==='en'?`Profit-positive. ${r.margin>0?'Purchase is under MAO.':'Purchase is at/above MAO — review.'}`:`Ganancia positiva. ${r.margin>0?'El precio está bajo la MAO.':'El precio está en o sobre la MAO — revisar.'}`):(LANG==='en'?'Profit is zero or negative — deal does not work.':'La ganancia es cero o negativa — el negocio no funciona.')}</p></div>`}
+['ff-arv','ff-rehab','ff-purchase','ff-holding','ff-selling','ff-rule'].forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)renderFixFlip()}));
+
+/* ============================================================
+   DICTIONARY
+   ============================================================ */
+function renderDictChips(){const el=document.getElementById('dict-chips');const cats=[['all',{es:'Todas',en:'All'}]].concat(Object.entries(CATS));el.innerHTML=cats.map(([k,v])=>`<button class="chip" data-cat="${k}" aria-pressed="${DICT_FILTER===k}" onclick="filterDict('${k}')">${v[LANG]}</button>`).join('')}
+function filterDict(c){DICT_FILTER=c;renderDictChips();renderDict()}
+function renderDict(){const q=DICT_QUERY.trim().toLowerCase();const filtered=DICT.filter(t=>{if(DICT_FILTER!=='all'&&t.c!==DICT_FILTER)return false;if(!q)return true;const hay=[t.es.t,t.es.d,t.es.e||'',t.en.t,t.en.d,t.en.e||''].join(' ').toLowerCase();return hay.includes(q)});document.getElementById('dict-count').textContent=(LANG==='en'?'Showing ':'Mostrando ')+filtered.length+(LANG==='en'?' of ':' de ')+DICT.length+(LANG==='en'?' terms':' términos');document.getElementById('dict-list').innerHTML=filtered.map(t=>{const p=t[LANG],alt=t[LANG==='es'?'en':'es'];return`<div class="term"><div class="term-cat">${CATS[t.c][LANG]}</div><div><h3>${escapeHtml(p.t)}</h3><p class="def">${escapeHtml(p.d)}</p>${p.e?`<p class="ex"><span class="ex-label">${LANG==='en'?'Example':'Ejemplo'}:</span>${escapeHtml(p.e)}</p>`:''}<div class="alt"><strong>${LANG==='en'?'Spanish':'Inglés'}:</strong> ${escapeHtml(alt.t)} · ${escapeHtml(alt.d)}</div></div></div>`}).join('')||`<p class="muted mt-3">${LANG==='en'?'No results.':'Sin resultados.'}</p>`}
+document.addEventListener('input',e=>{if(e.target.id==='dict-q'){DICT_QUERY=e.target.value;renderDict()}});
+
+/* ============================================================
+   CONTRACTS
+   ============================================================ */
+function renderContracts(){const el=document.getElementById('contracts-list');el.innerHTML=CONTRACT_META.map(c=>{const m=c[LANG];return`<div class="contract-row"><div><h3>${m.t}</h3><p>${m.s}</p></div><div class="contract-actions"><button class="btn btn-primary btn-sm" onclick="openContract('${c.id}','es')">↓ ${LANG==='en'?'Spanish (PDF)':'Español (PDF)'}</button><button class="btn btn-secondary btn-sm" onclick="openContract('${c.id}','en')">↓ ${LANG==='en'?'English (PDF)':'Inglés (PDF)'}</button></div></div>`}).join('')}
+
+function openContract(id,lang){
+  const tpl=CONTRACTS[id][lang];const w=window.open('','_blank');if(!w){alert(LANG==='en'?'Please allow popups.':'Por favor permite ventanas emergentes.');return}
+  const sections=tpl.sections.map(s=>{
+    const blocks=s.blocks.map(b=>{
+      if(b.p)return`<p>${escapeHtml(b.p)}</p>`;
+      if(b.l)return`<ul>${b.l.map(i=>`<li>${escapeHtml(i)}</li>`).join('')}</ul>`;
+      if(b.s)return b.s.map(sig=>`<div class="sig"><p><strong>${escapeHtml(sig.label)}:</strong></p><p>${lang==='es'?'Firma':'Signature'}: ____________________________________</p>${sig.name?`<p>${lang==='es'?'Nombre':'Name'}: ______________________________________</p>`:''}<p>${lang==='es'?'Fecha':'Date'}: ____ / ____ / ______</p></div>`).join('');
+      return''
+    }).join('');
+    return`<section><h2><span class="num">${s.n}.</span> ${escapeHtml(s.t)}</h2>${blocks}</section>`
+  }).join('');
+  w.document.write(`<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><title>${tpl.title}</title><style>
+    @page{margin:1in}
+    body{font-family:Georgia,serif;color:#1A1714;max-width:7in;margin:0 auto;padding:1in 0;line-height:1.55}
+    h1{font-size:18pt;text-align:center;margin:0 0 .5in;letter-spacing:-.01em}
+    h2{font-size:12pt;margin:1.2em 0 .5em;text-transform:uppercase;letter-spacing:.05em}
+    h2 .num{color:#A8553D;margin-right:.5em}
+    p{margin:.5em 0;font-size:11pt}
+    ul{margin:.4em 0 .8em 0;padding-left:1.5em;font-size:11pt}
+    li{margin:.2em 0}
+    .sig{margin:1em 0}
+    .sig p{margin:.25em 0}
+    .toolbar{position:fixed;top:0;left:0;right:0;background:#1A1714;color:#FAF7F2;padding:.625rem 1rem;display:flex;gap:.5rem;font-family:system-ui,sans-serif;font-size:.875rem;z-index:100}
+    .toolbar button{background:#A8553D;color:#FAF7F2;border:0;padding:.4rem .9rem;font-size:.8rem;cursor:pointer}
+    .toolbar button.sec{background:transparent;border:1px solid rgba(255,255,255,.3)}
+    @media print{.toolbar{display:none}body{padding:0}}
+  </style></head><body><div class="toolbar"><button onclick="window.print()">${lang==='es'?'Imprimir / Guardar como PDF':'Print / Save as PDF'}</button><button class="sec" onclick="window.close()">${lang==='es'?'Cerrar':'Close'}</button></div><h1>${tpl.title}</h1>${sections}</body></html>`);
+  w.document.close();
+}
+
+/* ============================================================
+   PIPELINE
+   ============================================================ */
+function renderKanban(){const el=document.getElementById('kanban');const stages=Object.keys(STAGES);el.innerHTML=stages.map(s=>{const items=PIPELINE.filter(d=>d.stage===s);return`<div class="column" data-stage="${s}"><h3>${STAGES[s][LANG]} <span class="count">${items.length}</span></h3>${items.length?items.map(d=>renderDeal(d,s,stages)).join(''):`<p class="empty-col">${LANG==='en'?'No deals':'Sin negocios'}</p>`}</div>`}).join('')}
+function renderDeal(d,s,stages){const idx=stages.indexOf(s);const prev=idx>0?stages[idx-1]:null;const next=idx<stages.length-1?stages[idx+1]:null;return`<div class="deal"><div class="deal-addr">${escapeHtml(d.address||'—')}</div>${d.seller?`<div class="muted small">${escapeHtml(d.seller)}</div>`:''}<div class="deal-meta">${d.purchase?`P ${fmtCurrency(d.purchase)}`:''}${d.arv?` · ARV ${fmtCurrency(d.arv)}`:''}</div><div class="deal-actions">${prev?`<button onclick="moveDeal('${d.id}','${prev}')">← ${STAGES[prev][LANG]}</button>`:''}${next?`<button onclick="moveDeal('${d.id}','${next}')">${STAGES[next][LANG]} →</button>`:''}<button onclick="editDeal('${d.id}')">${LANG==='en'?'Edit':'Editar'}</button><button onclick="deleteDeal('${d.id}')">✕</button></div></div>`}
+function moveDeal(id,stage){const d=PIPELINE.find(x=>x.id===id);if(d){d.stage=stage;d.updatedAt=Date.now();saveJSON('jdps.pipeline.v1',PIPELINE);renderKanban()}}
+function openDealModal(){DEAL_EDIT_ID=null;document.getElementById('d-addr').value='';document.getElementById('d-seller').value='';document.getElementById('d-purchase').value='';document.getElementById('d-arv').value='';document.getElementById('d-rehab').value='';document.getElementById('d-notes').value='';document.getElementById('deal-modal').classList.add('active')}
+function editDeal(id){const d=PIPELINE.find(x=>x.id===id);if(!d)return;DEAL_EDIT_ID=id;document.getElementById('d-addr').value=d.address||'';document.getElementById('d-seller').value=d.seller||'';document.getElementById('d-purchase').value=d.purchase||'';document.getElementById('d-arv').value=d.arv||'';document.getElementById('d-rehab').value=d.rehab||'';document.getElementById('d-notes').value=d.notes||'';document.getElementById('deal-modal').classList.add('active')}
+function saveDeal(){const data={address:document.getElementById('d-addr').value.trim(),seller:document.getElementById('d-seller').value.trim(),purchase:+document.getElementById('d-purchase').value||0,arv:+document.getElementById('d-arv').value||0,rehab:+document.getElementById('d-rehab').value||0,notes:document.getElementById('d-notes').value.trim()};if(DEAL_EDIT_ID){const d=PIPELINE.find(x=>x.id===DEAL_EDIT_ID);Object.assign(d,data);d.updatedAt=Date.now()}else{PIPELINE.push({id:'d'+Date.now()+Math.random().toString(36).slice(2,6),stage:'prospecto',createdAt:Date.now(),updatedAt:Date.now(),...data})}saveJSON('jdps.pipeline.v1',PIPELINE);closeModal('deal-modal');renderKanban()}
+function deleteDeal(id){if(!confirm(LANG==='en'?'Delete this deal?':'¿Eliminar este negocio?'))return;PIPELINE=PIPELINE.filter(x=>x.id!==id);saveJSON('jdps.pipeline.v1',PIPELINE);renderKanban()}
+function exportPipeline(){download('pipeline.json',JSON.stringify(PIPELINE,null,2))}
+
+/* ============================================================
+   BUYERS
+   ============================================================ */
+function renderBuyersList(){const el=document.getElementById('buyers-list');if(!BUYERS.length){el.innerHTML=`<p class="muted small mt-2">${LANG==='en'?'No buyers yet. Click + to add one.':'Aún no hay compradores. Pulsa + para agregar uno.'}</p>`;return}el.innerHTML=BUYERS.map(b=>`<div class="buyer"><div><div class="buyer-name">${escapeHtml(b.name)}</div><div class="buyer-meta">${b.phone?`📞 ${escapeHtml(b.phone)}`:''}${b.email?` · ✉ ${escapeHtml(b.email)}`:''}${b.min||b.max?` · ${fmtCurrency(b.min||0)}–${fmtCurrency(b.max||0)}`:''}</div>${b.areas&&b.areas.length?`<div class="muted small mt-1">${LANG==='en'?'Areas':'Áreas'}: ${b.areas.map(escapeHtml).join(', ')}</div>`:''}${b.tags&&b.tags.length?`<div class="tags">${b.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>`:''}${b.notes?`<div class="muted small mt-1">${escapeHtml(b.notes)}</div>`:''}</div><div class="deal-actions"><button onclick="editBuyer('${b.id}')">${LANG==='en'?'Edit':'Editar'}</button><button onclick="deleteBuyer('${b.id}')">✕</button></div></div>`).join('')}
+function openBuyerModal(){BUYER_EDIT_ID=null;['b-name','b-phone','b-email','b-min','b-max','b-areas','b-tags','b-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('buyer-modal').classList.add('active')}
+function editBuyer(id){const b=BUYERS.find(x=>x.id===id);if(!b)return;BUYER_EDIT_ID=id;document.getElementById('b-name').value=b.name||'';document.getElementById('b-phone').value=b.phone||'';document.getElementById('b-email').value=b.email||'';document.getElementById('b-min').value=b.min||'';document.getElementById('b-max').value=b.max||'';document.getElementById('b-areas').value=(b.areas||[]).join(', ');document.getElementById('b-tags').value=(b.tags||[]).join(', ');document.getElementById('b-notes').value=b.notes||'';document.getElementById('buyer-modal').classList.add('active')}
+function saveBuyer(){const data={name:document.getElementById('b-name').value.trim(),phone:document.getElementById('b-phone').value.trim(),email:document.getElementById('b-email').value.trim(),min:+document.getElementById('b-min').value||0,max:+document.getElementById('b-max').value||0,areas:document.getElementById('b-areas').value.split(',').map(s=>s.trim()).filter(Boolean),tags:document.getElementById('b-tags').value.split(',').map(s=>s.trim()).filter(Boolean),notes:document.getElementById('b-notes').value.trim()};if(!data.name){alert(LANG==='en'?'Name required':'Nombre requerido');return}if(BUYER_EDIT_ID){const b=BUYERS.find(x=>x.id===BUYER_EDIT_ID);Object.assign(b,data)}else{BUYERS.push({id:'b'+Date.now()+Math.random().toString(36).slice(2,6),...data})}saveJSON('jdps.buyers.v1',BUYERS);closeModal('buyer-modal');renderBuyersList()}
+function deleteBuyer(id){if(!confirm(LANG==='en'?'Delete this buyer?':'¿Eliminar este comprador?'))return;BUYERS=BUYERS.filter(x=>x.id!==id);saveJSON('jdps.buyers.v1',BUYERS);renderBuyersList()}
+function exportBuyers(){download('buyers.json',JSON.stringify(BUYERS,null,2))}
+
+/* ============================================================
+   SKIP TRACE
+   ============================================================ */
+function renderSkip(){const name=document.getElementById('sk-name').value.trim(),prop=document.getElementById('sk-prop').value.trim(),mail=document.getElementById('sk-mail').value.trim(),phones=document.getElementById('sk-phones').value.trim(),emails=document.getElementById('sk-emails').value.trim(),rel=document.getElementById('sk-related').value.trim(),vesting=document.getElementById('sk-vesting').value.trim();const mismatch=mail&&prop&&mail!==prop;const labels=LANG==='en'?{name:'OWNER',prop:'PROPERTY ADDRESS',mail:'MAILING ADDRESS',mis:'(mailing differs from property — absentee)',phones:'PHONES',emails:'EMAILS',rel:'RELATED PEOPLE',vesting:'VESTING'}:{name:'DUEÑO',prop:'DIRECCIÓN DE LA PROPIEDAD',mail:'DIRECCIÓN POSTAL',mis:'(la postal difiere de la propiedad — absentee)',phones:'TELÉFONOS',emails:'EMAILS',rel:'PERSONAS RELACIONADAS',vesting:'VESTING'};const parts=[];if(name)parts.push(`${labels.name}: ${name}`);if(prop)parts.push(`${labels.prop}: ${prop}`);if(mail)parts.push(`${labels.mail}: ${mail}${mismatch?'\n  '+labels.mis:''}`);if(phones)parts.push(`${labels.phones}:\n${phones.split('\n').map(p=>'  '+p).join('\n')}`);if(emails)parts.push(`${labels.emails}:\n${emails.split('\n').map(p=>'  '+p).join('\n')}`);if(rel)parts.push(`${labels.rel}:\n${rel.split('\n').map(p=>'  '+p).join('\n')}`);if(vesting)parts.push(`${labels.vesting}: ${vesting}`);document.getElementById('sk-output').textContent=parts.join('\n\n')||(LANG==='en'?'(fill in data to see formatted output)':'(llena los datos para ver la salida)')}
+
+/* ============================================================
+   MAIL + SCRIPTS
+   ============================================================ */
+function populateSelects(){
+  const mt=document.getElementById('mail-type');const cur=mt.value||'probate';mt.innerHTML=Object.entries(MAIL_TYPES).map(([k,v])=>`<option value="${k}" ${k===cur?'selected':''}>${v[LANG]}</option>`).join('');
+  const st=document.getElementById('sc-type');const sc=st.value||'absentee';st.innerHTML=Object.entries(SCRIPT_TYPES).map(([k,v])=>`<option value="${k}" ${k===sc?'selected':''}>${v[LANG]}</option>`).join('');
+  const tn=document.getElementById('sc-tone');const tc=tn.value||'consult';tn.innerHTML=Object.entries(TONES).map(([k,v])=>`<option value="${k}" ${k===tc?'selected':''}>${v[LANG]}</option>`).join('');
+}
+function renderMail(){const type=document.getElementById('mail-type').value;const owner=document.getElementById('mail-owner').value.trim();const addr=document.getElementById('mail-addr').value.trim();const me=document.getElementById('mail-me').value.trim();const tpl=(MAIL_TEMPLATES[type]&&MAIL_TEMPLATES[type][LANG])||function(){return''};document.getElementById('mail-output').textContent=tpl(owner,addr,me)}
+function renderScript(){const t=document.getElementById('sc-type').value,tn=document.getElementById('sc-tone').value;const s=SCRIPTS[t]&&SCRIPTS[t][tn]&&SCRIPTS[t][tn][LANG];document.getElementById('sc-output').textContent=s||(LANG==='en'?'(no script for this combination)':'(sin script para esta combinación)')}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function escapeAttr(s){return escapeHtml(s)}
+function copyOut(id){const t=document.getElementById(id).textContent;if(!t)return;navigator.clipboard.writeText(t).then(()=>{const btn=event.target;const old=btn.textContent;btn.textContent=LANG==='en'?'Copied':'Copiado';setTimeout(()=>{btn.textContent=old},1500)}).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta)})}
+function printOut(id){const t=document.getElementById(id).textContent;const w=window.open('','_blank');w.document.write(`<!doctype html><html><head><title>Print</title><style>body{font-family:Georgia,serif;max-width:6.5in;margin:1in auto;line-height:1.6;white-space:pre-wrap}</style></head><body>${escapeHtml(t)}<script>window.print()<\/script></body></html>`);w.document.close()}
+function closeModal(id){document.getElementById(id).classList.remove('active')}
+function download(name,content,type){const blob=new Blob([content],{type:type||'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1000)}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+(function init(){
+  // Lang buttons
+  document.getElementById('lang-es').addEventListener('click',()=>setLang('es'));
+  document.getElementById('lang-en').addEventListener('click',()=>setLang('en'));
+
+  // Tab buttons
+  document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.tab)));
+
+  // Sub-nav buttons
+  document.querySelectorAll('[data-sub-nav]').forEach(nav=>{
+    const page=nav.dataset.subNav;
+    nav.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>showSub(page,b.dataset.sub)))
+  });
+
+  // Restore lang
+  try{const saved=localStorage.getItem('jdps.lang');if(saved==='en'||saved==='es')LANG=saved}catch(e){}
+  setLang(LANG);
+})();
+</script>
+
+</body>
+</html>
