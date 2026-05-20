@@ -347,7 +347,7 @@ html[lang="en"] span[data-lang="en"],html[lang="en"] em[data-lang="en"]{display:
         <div class="divider"><span data-lang="es">Datos del préstamo</span><span data-lang="en">Loan details</span></div>
         <div class="field">
           <label><span data-lang="es">Monto del préstamo</span><span data-lang="en">Loan amount</span></label>
-          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="number" class="input num" id="m-loan" value="200000"/></div>
+          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="text" inputmode="decimal" data-money class="input num" id="m-loan" value="200000" oninput="formatMoneyInput(this)"/></div>
         </div>
         <div class="field">
           <label><span data-lang="es">Tasa anual</span><span data-lang="en">Annual rate</span></label>
@@ -372,7 +372,7 @@ html[lang="en"] span[data-lang="en"],html[lang="en"] em[data-lang="en"]{display:
         <div class="divider"><span data-lang="es">Propiedad sujeto</span><span data-lang="en">Subject property</span></div>
         <div class="field">
           <label><span data-lang="es">Pies cuadrados del sujeto</span><span data-lang="en">Subject square feet</span></label>
-          <div class="input-wrap has-suffix" style="max-width:14rem"><input type="number" class="input num" id="arv-sqft" value="1200"/><span class="suffix">ft²</span></div>
+          <div class="input-wrap has-suffix" style="max-width:14rem"><input type="text" inputmode="decimal" data-money class="input num" id="arv-sqft" value="1200" oninput="formatMoneyInput(this)"/><span class="suffix">ft²</span></div>
         </div>
 
         <div class="divider"><span data-lang="es">Comparables vendidos</span><span data-lang="en">Sold comparables</span></div>
@@ -393,27 +393,29 @@ html[lang="en"] span[data-lang="en"],html[lang="en"] em[data-lang="en"]{display:
         <div class="divider"><span data-lang="es">Datos del negocio</span><span data-lang="en">Deal inputs</span></div>
         <div class="field">
           <label>ARV (<span data-lang="es">valor después de reparaciones</span><span data-lang="en">after-repair value</span>)</label>
-          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="number" class="input num" id="ff-arv" value="260000"/></div>
+          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="text" inputmode="decimal" data-money class="input num" id="ff-arv" value="260000" oninput="formatMoneyInput(this)"/></div>
         </div>
         <div class="field">
           <label><span data-lang="es">Costo de rehab</span><span data-lang="en">Rehab cost</span></label>
-          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="number" class="input num" id="ff-rehab" value="35000"/></div>
+          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="text" inputmode="decimal" data-money class="input num" id="ff-rehab" value="35000" oninput="formatMoneyInput(this)"/></div>
         </div>
         <div class="field">
           <label><span data-lang="es">Precio de compra</span><span data-lang="en">Purchase price</span></label>
-          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="number" class="input num" id="ff-purchase" value="140000"/></div>
+          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="text" inputmode="decimal" data-money class="input num" id="ff-purchase" value="140000" oninput="formatMoneyInput(this)"/></div>
         </div>
         <div class="field">
           <label><span data-lang="es">Costos de mantenimiento (holding)</span><span data-lang="en">Holding costs</span></label>
-          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="number" class="input num" id="ff-holding" value="5000"/></div>
+          <div class="input-wrap has-prefix"><span class="prefix">$</span><input type="text" inputmode="decimal" data-money class="input num" id="ff-holding" value="5000" oninput="formatMoneyInput(this)"/></div>
         </div>
         <div class="field">
-          <label><span data-lang="es">Costos de venta</span><span data-lang="en">Selling costs</span></label>
-          <div class="input-wrap has-suffix"><input type="number" class="input num" id="ff-selling" value="8"/><span class="suffix">%</span></div>
+          <label><span data-lang="es">Costos de venta (% del ARV)</span><span data-lang="en">Selling costs (% of ARV)</span></label>
+          <div class="input-wrap has-suffix" style="max-width:11rem"><input type="number" class="input num" id="ff-selling" value="8" step="0.5" min="0" max="20"/><span class="suffix">%</span></div>
+          <p class="muted small" style="margin:.375rem 0 0;font-size:.75rem"><span data-lang="es">Típico 6–10% · comisiones + cierre del lado del vendedor</span><span data-lang="en">Typical 6–10% · commissions + seller-side closing</span></p>
         </div>
         <div class="field">
-          <label><span data-lang="es">Regla MAO</span><span data-lang="en">MAO rule</span></label>
-          <div class="input-wrap has-suffix" style="max-width:11rem"><input type="number" class="input num" id="ff-rule" value="70"/><span class="suffix">%</span></div>
+          <label><span data-lang="es">Regla MAO (% del ARV)</span><span data-lang="en">MAO rule (% of ARV)</span></label>
+          <div class="input-wrap has-suffix" style="max-width:11rem"><input type="number" class="input num" id="ff-rule" value="70" step="1" min="50" max="90"/><span class="suffix">%</span></div>
+          <p class="muted small" style="margin:.375rem 0 0;font-size:.75rem"><span data-lang="es">Típico 65–75%</span><span data-lang="en">Typical 65–75%</span></p>
         </div>
       </div>
       <div>
@@ -584,9 +586,9 @@ html[lang="en"] span[data-lang="en"],html[lang="en"] em[data-lang="en"]{display:
     <div class="field"><label><span data-lang="es">Dirección</span><span data-lang="en">Address</span></label><input class="input" id="d-addr"/></div>
     <div class="field"><label><span data-lang="es">Vendedor</span><span data-lang="en">Seller</span></label><input class="input" id="d-seller"/></div>
     <div class="grid-3" style="gap:.625rem">
-      <div class="field"><label><span data-lang="es">Compra</span><span data-lang="en">Purchase</span></label><input class="input num" type="number" id="d-purchase"/></div>
-      <div class="field"><label>ARV</label><input class="input num" type="number" id="d-arv"/></div>
-      <div class="field"><label>Rehab</label><input class="input num" type="number" id="d-rehab"/></div>
+      <div class="field"><label><span data-lang="es">Compra</span><span data-lang="en">Purchase</span></label><input class="input num" type="text" inputmode="decimal" data-money id="d-purchase" oninput="formatMoneyInput(this)"/></div>
+      <div class="field"><label>ARV</label><input class="input num" type="text" inputmode="decimal" data-money id="d-arv" oninput="formatMoneyInput(this)"/></div>
+      <div class="field"><label>Rehab</label><input class="input num" type="text" inputmode="decimal" data-money id="d-rehab" oninput="formatMoneyInput(this)"/></div>
     </div>
     <div class="field"><label><span data-lang="es">Notas</span><span data-lang="en">Notes</span></label><textarea class="input" id="d-notes" rows="2"></textarea></div>
     <div class="modal-actions">
@@ -606,8 +608,8 @@ html[lang="en"] span[data-lang="en"],html[lang="en"] em[data-lang="en"]{display:
       <div class="field"><label>Email</label><input class="input" id="b-email"/></div>
     </div>
     <div class="grid-2" style="gap:.625rem">
-      <div class="field"><label><span data-lang="es">Precio mín.</span><span data-lang="en">Min price</span></label><div class="input-wrap has-prefix"><span class="prefix">$</span><input class="input num" type="number" id="b-min"/></div></div>
-      <div class="field"><label><span data-lang="es">Precio máx.</span><span data-lang="en">Max price</span></label><div class="input-wrap has-prefix"><span class="prefix">$</span><input class="input num" type="number" id="b-max"/></div></div>
+      <div class="field"><label><span data-lang="es">Precio mín.</span><span data-lang="en">Min price</span></label><div class="input-wrap has-prefix"><span class="prefix">$</span><input class="input num" type="text" inputmode="decimal" data-money id="b-min" oninput="formatMoneyInput(this)"/></div></div>
+      <div class="field"><label><span data-lang="es">Precio máx.</span><span data-lang="en">Max price</span></label><div class="input-wrap has-prefix"><span class="prefix">$</span><input class="input num" type="text" inputmode="decimal" data-money id="b-max" oninput="formatMoneyInput(this)"/></div></div>
     </div>
     <div class="field"><label><span data-lang="es">Áreas (separadas por coma)</span><span data-lang="en">Areas (comma-separated)</span></label><input class="input" id="b-areas" placeholder="00907, 00911, Bayamón"/></div>
     <div class="field"><label><span data-lang="es">Tags (separados por coma)</span><span data-lang="en">Tags (comma-separated)</span></label><input class="input" id="b-tags" placeholder="cash, fix-flip, sub-to"/></div>
@@ -802,7 +804,9 @@ const MAIL_TYPES = {
   tired: {es:'Casero cansado',en:'Tired landlord'},
   vacant: {es:'Propiedad vacante',en:'Vacant property'},
   absentee: {es:'Dueño ausente',en:'Absentee owner'},
-  taxes: {es:'Atraso de impuestos',en:'Tax delinquent'}
+  taxes: {es:'Atraso de impuestos',en:'Tax delinquent'},
+  section8: {es:'Casero de Sección 8',en:'Section 8 landlord'},
+  fixflip: {es:'Flipper estancado',en:'Stuck flipper'}
 };
 
 const MAIL_TEMPLATES = {
@@ -829,6 +833,14 @@ const MAIL_TEMPLATES = {
   taxes: {
     es: (o,a,me)=>`Estimado/a ${o||'[Nombre]'}:\n\nSoy ${me||'[Tu nombre]'}, inversionista local. Le escribo respecto a la propiedad en ${a||'[Dirección]'}.\n\nLos impuestos atrasados pueden poner una propiedad en riesgo. He ayudado a otros propietarios a resolver esta situación sin pérdida total.\n\nPuedo ofrecer:\n\n  • Efectivo para liquidar los impuestos\n  • Compra rápida y discreta\n  • Sin reparaciones\n  • Cierre en 7 a 14 días\n\nLlámeme o envíeme texto, sin compromiso: ${me?me.split('·')[1]||'[teléfono]':'[teléfono]'}.\n\nConfidencial,\n${me||'[Tu nombre]'}`,
     en: (o,a,me)=>`Dear ${o||'[Name]'}:\n\nI’m ${me||'[Your name]'}, a local investor. Writing about the property at ${a||'[Address]'}.\n\nDelinquent taxes can put a property at risk. I’ve helped other owners resolve this situation without total loss.\n\nI can offer:\n\n  • Cash to clear back taxes\n  • Quick discreet purchase\n  • No repairs\n  • Close in 7 to 14 days\n\nCall or text, no obligation: ${me?me.split('·')[1]||'[phone]':'[phone]'}.\n\nConfidential,\n${me||'[Your name]'}`
+  },
+  section8: {
+    es: (o,a,me)=>`Estimado/a ${o||'[Nombre del dueño]'}:\n\nSoy ${me||'[Tu nombre]'}, inversionista local. Le escribo respecto a su propiedad de Sección 8 en ${a||'[Dirección]'}.\n\nSabemos lo que implica un programa de Sección 8: inspecciones HUD, papeleo de la Autoridad de Vivienda, esperar el voucher cada mes, lidiar con cambios de FMR. Si está pensando en salirse del programa, soy un comprador serio en efectivo.\n\nOfrezco:\n\n  • Compra en efectivo — cero financiamiento\n  • Compro con el inquilino adentro (no afecta su voucher)\n  • Sin inspecciones HUD ni papeleo\n  • Cierre en 14 días o menos\n  • Sin comisiones de agente\n\nUna llamada de 5 minutos le da los números. ${me?me.split('·')[1]||'[teléfono]':'[teléfono]'}.\n\nGracias por su tiempo,\n${me||'[Tu nombre]'}`,
+    en: (o,a,me)=>`Dear ${o||'[Owner name]'}:\n\nI’m ${me||'[Your name]'}, a local investor. I’m writing about your Section 8 property at ${a||'[Address]'}.\n\nWe know what running a Section 8 property entails: HUD inspections, Housing Authority paperwork, waiting for the voucher every month, dealing with FMR changes. If you’re thinking about exiting the program, I’m a serious cash buyer.\n\nI offer:\n\n  • Cash purchase — zero financing\n  • I buy with the tenant in place (doesn’t affect their voucher)\n  • No HUD inspections or paperwork\n  • Close in 14 days or less\n  • No agent commissions\n\nA 5-minute call gets you the numbers. ${me?me.split('·')[1]||'[phone]':'[phone]'}.\n\nThanks for your time,\n${me||'[Your name]'}`
+  },
+  fixflip: {
+    es: (o,a,me)=>`Hola ${o||'[Nombre]'}:\n\nSoy ${me||'[Tu nombre]'}, inversionista local. Sé que tienes un proyecto en ${a||'[Dirección]'}. He notado que el progreso se detuvo un tiempo.\n\nHe estado donde estás. A veces los proyectos crecen: el rehab cuesta más, el contratista desaparece, las tasas suben, los costos de holding aprietan. Si quieres salirte del negocio antes de seguir sangrando, te puedo dar una salida limpia.\n\nCompro flips a medio terminar:\n\n  • Pago en efectivo — cierro en 7 a 14 días\n  • Te tomo la propiedad tal como está (con materiales, herramientas, lo que sea)\n  • Sin inspección de banco, sin retrasos\n  • Asumes lo invertido más un margen si hay equity\n  • Confidencial — nadie tiene que saber\n\nLlámame o envíame texto: ${me?me.split('·')[1]||'[teléfono]':'[teléfono]'}.\n\nGracias,\n${me||'[Tu nombre]'}`,
+    en: (o,a,me)=>`Hi ${o||'[Name]'}:\n\nI’m ${me||'[Your name]'}, a local investor. I know you have a project at ${a||'[Address]'}. I noticed progress slowed down for a while.\n\nI’ve been where you are. Sometimes projects grow: the rehab costs more, the contractor disappears, rates go up, holding costs squeeze. If you want to exit before bleeding more, I can give you a clean way out.\n\nI buy half-finished flips:\n\n  • Cash — close in 7 to 14 days\n  • Take it as-is (with materials, tools, whatever)\n  • No bank inspection, no delays\n  • You recoup what you’ve put in plus a margin if there’s equity\n  • Confidential — nobody has to know\n\nCall or text: ${me?me.split('·')[1]||'[phone]':'[phone]'}.\n\nThanks,\n${me||'[Your name]'}`
   }
 };
 
@@ -839,7 +851,9 @@ const SCRIPT_TYPES = {
   preforeclosure: {es:'Pre-ejecución',en:'Pre-foreclosure'},
   tired: {es:'Casero cansado',en:'Tired landlord'},
   fsbo: {es:'FSBO',en:'FSBO'},
-  vacant: {es:'Vacante',en:'Vacant'}
+  vacant: {es:'Vacante',en:'Vacant'},
+  section8: {es:'Casero Sección 8',en:'Section 8 landlord'},
+  fixflip: {es:'Flipper estancado',en:'Stuck flipper'}
 };
 const TONES = {consult:{es:'Consultivo',en:'Consultative'},direct:{es:'Directo',en:'Direct'}};
 
@@ -903,6 +917,26 @@ const SCRIPTS = {
       es:`"Tu casa en [dirección] está vacía. Te la compro en efectivo. ¿Cuánto?"`,
       en:`"Your house at [address] is vacant. I’ll buy cash. How much?"`
     }
+  },
+  section8: {
+    consult: {
+      es:`APERTURA\n"Hola, ¿hablo con [nombre]? Soy [tu nombre], inversionista local. Vi que tienes una propiedad de Sección 8 en [dirección]. ¿Tienes un par de minutos?"\n\nEMPATÍA\n"Sé cómo es: inspecciones HUD, papeleo de la Autoridad, esperar el voucher cada mes. Mucho papeleo."\n\nQUALIFICAR\n"¿Cuánto llevas en el programa?"\n"¿El inquilino actual paga al día con su parte?"\n"¿Cuánto te paga la Sección 8 al mes?"\n"¿Has pensado en salir del programa?"\n\nDOLOR\n"¿Cuál es el mayor dolor de cabeza — las inspecciones, el papeleo, o el inquilino?"\n\nOFERTA\n"Compro propiedades de Sección 8 con el inquilino adentro. Eso significa que el voucher no se afecta. Pago en efectivo, cierro en 14 días, sin inspección HUD del lado del comprador."\n\nNÚMERO\n"Basado en lo que me dices, podría ofrecer alrededor de [rango]. ¿Eso funcionaría?"\n\nCIERRE\n"¿Cuándo paso a verla? Manejo todo el papeleo de la Autoridad por mi cuenta."`,
+      en:`OPENING\n"Hi, is this [name]? I’m [your name], local investor. Saw you own a Section 8 property at [address]. Got a couple minutes?"\n\nEMPATHY\n"I know how it goes: HUD inspections, Housing Authority paperwork, waiting for the voucher every month. A lot of paperwork."\n\nQUALIFY\n"How long have you been in the program?"\n"Is the current tenant paying their portion on time?"\n"What is Section 8 paying you per month?"\n"Have you thought about exiting the program?"\n\nPAIN\n"What’s the biggest headache — the inspections, the paperwork, or the tenant?"\n\nOFFER\n"I buy Section 8 properties with the tenant in place. That means the voucher isn’t affected. Cash, close in 14 days, no buyer-side HUD inspection."\n\nNUMBER\n"Based on what you tell me, I could offer around [range]. Would that work?"\n\nCLOSE\n"When can I swing by? I handle all the Authority paperwork on my end."`
+    },
+    direct: {
+      es:`"[Nombre], soy [tu nombre]. Tu propiedad de Sección 8 en [dirección] — la compro en efectivo, cierro en 14 días, mantengo al inquilino. ¿Vendes?"`,
+      en:`"[Name], it’s [your name]. Your Section 8 property at [address] — I’ll buy cash, close in 14 days, keep the tenant. Selling?"`
+    }
+  },
+  fixflip: {
+    consult: {
+      es:`APERTURA\n"Hola, ¿hablo con [nombre]? Soy [tu nombre], inversionista local. Vi que tienes un proyecto en [dirección]. ¿Tienes un minuto?"\n\nVALIDACIÓN\n"Yo también hago flips, sé lo que es. Te llamo porque noté que el progreso se detuvo un tiempo."\n\nQUALIFICAR\n"¿Cuánto llevas con el proyecto?"\n"¿En qué fase estás? — demolición, rough-in, terminación…"\n"¿Cuánto llevas invertido entre compra y rehab?"\n"¿Cuál es el ARV que tenías proyectado?"\n\nDOLOR\n"¿Qué te tiene frenado — costos que se dispararon, contratista, financiamiento que se cerró?"\n\nOFERTA\n"Si quieres salirte limpio, te compro tal como está. Asumo el proyecto, los materiales, las herramientas si las dejas. Efectivo, cierro en 7 a 14 días."\n\nNÚMERO\n"Te recupero tu compra más rehab invertido, y si hay equity sobre eso, te doy un margen. ¿Cuántos números me das para correr el análisis?"\n\nCIERRE\n"¿Cuándo voy a verla? Confidencial — nadie tiene que enterarse."`,
+      en:`OPENING\n"Hi, is this [name]? I’m [your name], local investor. Saw you have a project at [address]. Got a minute?"\n\nVALIDATION\n"I do flips too, so I get it. Calling because I noticed progress slowed down."\n\nQUALIFY\n"How long have you been on the project?"\n"What phase are you in? — demo, rough-in, finishing…"\n"How much have you invested between purchase and rehab?"\n"What ARV were you projecting?"\n\nPAIN\n"What’s got you stuck — costs blew up, contractor, financing closed up?"\n\nOFFER\n"If you want a clean exit, I’ll buy it as-is. I take the project, the materials, tools if you leave them. Cash, close in 7 to 14 days."\n\nNUMBER\n"You recoup purchase plus rehab invested, and if there’s equity on top, I give you a margin. Can I get a few numbers to run the analysis?"\n\nCLOSE\n"When do I come see it? Confidential — nobody has to know."`
+    },
+    direct: {
+      es:`"[Nombre], soy [tu nombre]. Sé que tu flip en [dirección] está estancado. Te lo compro tal como está, efectivo, cierro en 10 días. ¿Hablamos?"`,
+      en:`"[Name], it’s [your name]. I know your flip at [address] is stuck. I’ll buy as-is, cash, close in 10 days. Want to talk?"`
+    }
   }
 };
 
@@ -948,18 +982,37 @@ function fmtCurrency(v,opts){const locale=LANG==='en'?'en-US':'es-US';return new
 /* ============================================================
    CALCULATORS
    ============================================================ */
-function calcMortgage(){const loan=+document.getElementById('m-loan').value,rate=+document.getElementById('m-rate').value,term=+document.getElementById('m-term').value;if(!loan||!rate||!term)return null;const n=term*12,r=rate/100/12;const m=r===0?loan/n:(loan*(r*Math.pow(1+r,n)))/(Math.pow(1+r,n)-1);let bal=loan;const sched=[];for(let i=1;i<=12&&i<=n;i++){const int=bal*r,pri=m-int;bal=Math.max(0,bal-pri);sched.push({m:i,int,pri,bal})}return{monthly:m,totalInterest:m*n-loan,totalPaid:m*n,sched}}
+function calcMortgage(){const loan=parseNum(document.getElementById('m-loan').value),rate=+document.getElementById('m-rate').value,term=+document.getElementById('m-term').value;if(!loan||!rate||!term)return null;const n=term*12,r=rate/100/12;const m=r===0?loan/n:(loan*(r*Math.pow(1+r,n)))/(Math.pow(1+r,n)-1);let bal=loan;const sched=[];for(let i=1;i<=12&&i<=n;i++){const int=bal*r,pri=m-int;bal=Math.max(0,bal-pri);sched.push({m:i,int,pri,bal})}return{monthly:m,totalInterest:m*n-loan,totalPaid:m*n,sched}}
 function renderMortgage(){const r=calcMortgage(),el=document.getElementById('m-results');if(!r){el.innerHTML='<p class="muted small">'+(LANG==='en'?'Enter loan details.':'Ingresa los datos del préstamo.')+'</p>';return}el.innerHTML=`<div class="result emphasis"><div><div class="result-label">${LANG==='en'?'Monthly payment (P&I)':'Pago mensual (P&I)'}</div></div><div class="result-value">${fmtCurrency(r.monthly,{maximumFractionDigits:2})}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Total interest paid':'Interés total a pagar'}</div><div class="result-value">${fmtCurrency(r.totalInterest)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Total paid':'Total pagado'}</div><div class="result-value">${fmtCurrency(r.totalPaid)}</div></div><div class="divider mt-3">${LANG==='en'?'Amortization — first 12 months':'Amortización — primeros 12 meses'}</div><table class="tab"><thead><tr><th>${LANG==='en'?'Month':'Mes'}</th><th class="num">${LANG==='en'?'Interest':'Interés'}</th><th class="num">${LANG==='en'?'Principal':'Principal'}</th><th class="num">${LANG==='en'?'Balance':'Saldo'}</th></tr></thead><tbody>${r.sched.map(s=>`<tr><td class="muted">${s.m}</td><td class="num">${fmtCurrency(s.int)}</td><td class="num">${fmtCurrency(s.pri)}</td><td class="num">${fmtCurrency(s.bal)}</td></tr>`).join('')}</tbody></table>`}
 ['m-loan','m-rate','m-term'].forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)renderMortgage()}));
 
-function calcArv(){const sqft=+document.getElementById('arv-sqft').value;const valid=ARV_COMPS.filter(c=>c.sqft>0&&c.soldPrice>0);if(!sqft||!valid.length)return null;const perComp=valid.map(c=>({address:c.address,ppsf:c.soldPrice/c.sqft}));const avg=perComp.reduce((s,c)=>s+c.ppsf,0)/perComp.length;const totalP=valid.reduce((s,c)=>s+c.soldPrice,0),totalS=valid.reduce((s,c)=>s+c.sqft,0);const w=totalP/totalS;return{avg,w,arv:sqft*w,low:sqft*Math.min(...perComp.map(c=>c.ppsf)),high:sqft*Math.max(...perComp.map(c=>c.ppsf)),perComp}}
-function renderArv(){const r=calcArv(),resEl=document.getElementById('arv-results'),compsEl=document.getElementById('arv-comps');compsEl.innerHTML=ARV_COMPS.map((c,i)=>`<div class="comp-row"><div class="field"><label>${LANG==='en'?'Address':'Dirección'} ${i+1}</label><input class="input" value="${escapeAttr(c.address)}" oninput="updateComp(${i},'address',this.value)"/></div><div class="field"><label>${LANG==='en'?'Sold price':'Precio vendido'}</label><div class="input-wrap has-prefix"><span class="prefix">$</span><input class="input num" type="number" value="${c.soldPrice||''}" oninput="updateComp(${i},'soldPrice',+this.value)"/></div></div><div class="field"><label>${LANG==='en'?'Sqft':'Pies²'}</label><div class="input-wrap has-suffix"><input class="input num" type="number" value="${c.sqft||''}" oninput="updateComp(${i},'sqft',+this.value)"/><span class="suffix">ft²</span></div></div><div><button class="remove-btn" onclick="removeComp(${i})">✕ ${LANG==='en'?'Remove':'Quitar'}</button></div></div>`).join('');if(!r){resEl.innerHTML='<p class="muted small">'+(LANG==='en'?'Enter subject sqft and at least one comp.':'Ingresa pies² del sujeto y al menos un comparable.')+'</p>';return}resEl.innerHTML=`<div class="result emphasis"><div><div class="result-label">${LANG==='en'?'Estimated ARV':'ARV estimado'}</div></div><div class="result-value">${fmtCurrency(r.arv)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'ARV range':'Rango ARV'}</div><div class="result-value">${fmtCurrency(r.low)} – ${fmtCurrency(r.high)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Average $/sqft':'Promedio $/ft²'}</div><div class="result-value">${fmtCurrency(r.avg,{maximumFractionDigits:2})}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Weighted $/sqft':'Ponderado $/ft²'}</div><div class="result-value">${fmtCurrency(r.w,{maximumFractionDigits:2})}</div></div><p class="eyebrow mt-3">${LANG==='en'?'$/sqft per comp':'$/ft² por comp'}</p><table class="tab mt-1"><tbody>${r.perComp.map((c,i)=>`<tr><td>${escapeHtml(c.address)||(LANG==='en'?'Comp ':'Comp ')+(i+1)}</td><td class="num">${fmtCurrency(c.ppsf,{maximumFractionDigits:2})}</td></tr>`).join('')}</tbody></table>`}
+function calcArv(){const sqft=parseNum(document.getElementById('arv-sqft').value);const valid=ARV_COMPS.filter(c=>c.sqft>0&&c.soldPrice>0);if(!sqft||!valid.length)return null;const perComp=valid.map(c=>({address:c.address,ppsf:c.soldPrice/c.sqft}));const avg=perComp.reduce((s,c)=>s+c.ppsf,0)/perComp.length;const totalP=valid.reduce((s,c)=>s+c.soldPrice,0),totalS=valid.reduce((s,c)=>s+c.sqft,0);const w=totalP/totalS;return{avg,w,arv:sqft*w,low:sqft*Math.min(...perComp.map(c=>c.ppsf)),high:sqft*Math.max(...perComp.map(c=>c.ppsf)),perComp}}
+function renderArv(){const r=calcArv(),resEl=document.getElementById('arv-results'),compsEl=document.getElementById('arv-comps');compsEl.innerHTML=ARV_COMPS.map((c,i)=>`<div class="comp-row"><div class="field"><label>${LANG==='en'?'Address':'Dirección'} ${i+1}</label><input class="input" value="${escapeAttr(c.address)}" oninput="updateComp(${i},'address',this.value)"/></div><div class="field"><label>${LANG==='en'?'Sold price':'Precio vendido'}</label><div class="input-wrap has-prefix"><span class="prefix">$</span><input class="input num" type="text" inputmode="decimal" value="${c.soldPrice?Number(c.soldPrice).toLocaleString('en-US'):''}" oninput="updateCompMoney(${i},'soldPrice',this)"/></div></div><div class="field"><label>${LANG==='en'?'Sqft':'Pies²'}</label><div class="input-wrap has-suffix"><input class="input num" type="text" inputmode="decimal" value="${c.sqft?Number(c.sqft).toLocaleString('en-US'):''}" oninput="updateCompMoney(${i},'sqft',this)"/><span class="suffix">ft²</span></div></div><div><button class="remove-btn" onclick="removeComp(${i})">✕ ${LANG==='en'?'Remove':'Quitar'}</button></div></div>`).join('');if(!r){resEl.innerHTML='<p class="muted small">'+(LANG==='en'?'Enter subject sqft and at least one comp.':'Ingresa pies² del sujeto y al menos un comparable.')+'</p>';return}resEl.innerHTML=`<div class="result emphasis"><div><div class="result-label">${LANG==='en'?'Estimated ARV':'ARV estimado'}</div></div><div class="result-value">${fmtCurrency(r.arv)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'ARV range':'Rango ARV'}</div><div class="result-value">${fmtCurrency(r.low)} – ${fmtCurrency(r.high)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Average $/sqft':'Promedio $/ft²'}</div><div class="result-value">${fmtCurrency(r.avg,{maximumFractionDigits:2})}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Weighted $/sqft':'Ponderado $/ft²'}</div><div class="result-value">${fmtCurrency(r.w,{maximumFractionDigits:2})}</div></div><p class="eyebrow mt-3">${LANG==='en'?'$/sqft per comp':'$/ft² por comp'}</p><table class="tab mt-1"><tbody>${r.perComp.map((c,i)=>`<tr><td>${escapeHtml(c.address)||(LANG==='en'?'Comp ':'Comp ')+(i+1)}</td><td class="num">${fmtCurrency(c.ppsf,{maximumFractionDigits:2})}</td></tr>`).join('')}</tbody></table>`}
 function updateComp(i,k,v){ARV_COMPS[i][k]=v;renderArv()}
+function updateCompMoney(i,k,el){
+  // Format on the fly with commas while typing
+  const caret=el.selectionStart||0;
+  const before=el.value;
+  const raw=before.replace(/[^0-9.]/g,'');
+  const n=parseNum(raw);
+  el.value=n?Number(n).toLocaleString('en-US'):'';
+  const commasBefore=(el.value.slice(0,caret).match(/,/g)||[]).length;
+  const oldCommas=(before.slice(0,caret).match(/,/g)||[]).length;
+  try{el.setSelectionRange(Math.max(0,caret+commasBefore-oldCommas),Math.max(0,caret+commasBefore-oldCommas))}catch(e){}
+  ARV_COMPS[i][k]=n;
+  // Re-run calc result without full re-render (full re-render would lose focus)
+  const r=calcArv();
+  const resEl=document.getElementById('arv-results');
+  if(r&&resEl)renderArvResults(r);
+}
+function renderArvResults(r){
+  document.getElementById('arv-results').innerHTML=`<div class="result emphasis"><div><div class="result-label">${LANG==='en'?'Estimated ARV':'ARV estimado'}</div></div><div class="result-value">${fmtCurrency(r.arv)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'ARV range':'Rango ARV'}</div><div class="result-value">${fmtCurrency(r.low)} – ${fmtCurrency(r.high)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Average $/sqft':'Promedio $/ft²'}</div><div class="result-value">${fmtCurrency(r.avg,{maximumFractionDigits:2})}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Weighted $/sqft':'Ponderado $/ft²'}</div><div class="result-value">${fmtCurrency(r.w,{maximumFractionDigits:2})}</div></div><p class="eyebrow mt-3">${LANG==='en'?'$/sqft per comp':'$/ft² por comp'}</p><table class="tab mt-1"><tbody>${r.perComp.map((c,i)=>`<tr><td>${escapeHtml(c.address)||(LANG==='en'?'Comp ':'Comp ')+(i+1)}</td><td class="num">${fmtCurrency(c.ppsf,{maximumFractionDigits:2})}</td></tr>`).join('')}</tbody></table>`
+}
 function removeComp(i){ARV_COMPS.splice(i,1);renderArv()}
 function addComp(){ARV_COMPS.push({address:'',soldPrice:0,sqft:0});renderArv()}
 document.addEventListener('input',e=>{if(e.target.id==='arv-sqft')renderArv()});
 
-function calcFixFlip(){const arv=+document.getElementById('ff-arv').value,rehab=+document.getElementById('ff-rehab').value,purchase=+document.getElementById('ff-purchase').value,holding=+document.getElementById('ff-holding').value,sell=+document.getElementById('ff-selling').value,rule=+document.getElementById('ff-rule').value;if(!arv)return null;const mao=arv*(rule/100)-rehab;const sellCost=arv*(sell/100);const inv=purchase+rehab+holding+sellCost;const profit=arv-inv;return{mao,sellCost,inv,profit,roi:inv>0?profit/inv*100:0,margin:mao-purchase}}
+function calcFixFlip(){const arv=parseNum(document.getElementById('ff-arv').value),rehab=parseNum(document.getElementById('ff-rehab').value),purchase=parseNum(document.getElementById('ff-purchase').value),holding=parseNum(document.getElementById('ff-holding').value),sell=+document.getElementById('ff-selling').value,rule=+document.getElementById('ff-rule').value;if(!arv)return null;const mao=arv*(rule/100)-rehab;const sellCost=arv*(sell/100);const inv=purchase+rehab+holding+sellCost;const profit=arv-inv;return{mao,sellCost,inv,profit,roi:inv>0?profit/inv*100:0,margin:mao-purchase}}
 function renderFixFlip(){const r=calcFixFlip(),el=document.getElementById('ff-results');if(!r){el.innerHTML='<p class="muted small">'+(LANG==='en'?'Enter ARV to evaluate.':'Ingresa el ARV para evaluar.')+'</p>';return}const pos=r.profit>0;el.innerHTML=`<div class="result emphasis"><div><div class="result-label">MAO — ${LANG==='en'?'Maximum Allowable Offer':'Máxima Oferta Permitida'}</div></div><div class="result-value">${fmtCurrency(r.mao)}</div></div><div class="result"><div><div class="result-label">${LANG==='en'?'Margin vs. purchase':'Margen vs. compra'}</div><span class="result-hint">${LANG==='en'?'MAO minus your purchase. Positive = available margin.':'MAO menos tu compra. Positivo = margen disponible.'}</span></div><div class="result-value">${fmtCurrency(r.margin)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Estimated profit':'Ganancia estimada'}</div><div class="result-value">${fmtCurrency(r.profit)}</div></div><div class="result"><div class="result-label">ROI</div><div class="result-value">${r.roi.toFixed(1)}%</div></div><div class="result"><div class="result-label">${LANG==='en'?'Computed selling cost':'Costo de venta calculado'}</div><div class="result-value">${fmtCurrency(r.sellCost)}</div></div><div class="result"><div class="result-label">${LANG==='en'?'Total invested':'Total invertido'}</div><div class="result-value">${fmtCurrency(r.inv)}</div></div><div class="callout" style="border-color:${pos?'var(--clay)':'var(--muted)'}"><p class="eyebrow">${pos?(LANG==='en'?'Deal profile':'Perfil del negocio'):(LANG==='en'?'Caution':'Precaución')}</p><p style="margin:0;font-size:.875rem">${pos?(LANG==='en'?`Profit-positive. ${r.margin>0?'Purchase is under MAO.':'Purchase is at/above MAO — review.'}`:`Ganancia positiva. ${r.margin>0?'El precio está bajo la MAO.':'El precio está en o sobre la MAO — revisar.'}`):(LANG==='en'?'Profit is zero or negative — deal does not work.':'La ganancia es cero o negativa — el negocio no funciona.')}</p></div>`}
 ['ff-arv','ff-rehab','ff-purchase','ff-holding','ff-selling','ff-rule'].forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)renderFixFlip()}));
 
@@ -1013,8 +1066,8 @@ function renderKanban(){const el=document.getElementById('kanban');const stages=
 function renderDeal(d,s,stages){const idx=stages.indexOf(s);const prev=idx>0?stages[idx-1]:null;const next=idx<stages.length-1?stages[idx+1]:null;return`<div class="deal"><div class="deal-addr">${escapeHtml(d.address||'—')}</div>${d.seller?`<div class="muted small">${escapeHtml(d.seller)}</div>`:''}<div class="deal-meta">${d.purchase?`P ${fmtCurrency(d.purchase)}`:''}${d.arv?` · ARV ${fmtCurrency(d.arv)}`:''}</div><div class="deal-actions">${prev?`<button onclick="moveDeal('${d.id}','${prev}')">← ${STAGES[prev][LANG]}</button>`:''}${next?`<button onclick="moveDeal('${d.id}','${next}')">${STAGES[next][LANG]} →</button>`:''}<button onclick="editDeal('${d.id}')">${LANG==='en'?'Edit':'Editar'}</button><button onclick="deleteDeal('${d.id}')">✕</button></div></div>`}
 function moveDeal(id,stage){const d=PIPELINE.find(x=>x.id===id);if(d){d.stage=stage;d.updatedAt=Date.now();saveJSON('jdps.pipeline.v1',PIPELINE);renderKanban()}}
 function openDealModal(){DEAL_EDIT_ID=null;document.getElementById('d-addr').value='';document.getElementById('d-seller').value='';document.getElementById('d-purchase').value='';document.getElementById('d-arv').value='';document.getElementById('d-rehab').value='';document.getElementById('d-notes').value='';document.getElementById('deal-modal').classList.add('active')}
-function editDeal(id){const d=PIPELINE.find(x=>x.id===id);if(!d)return;DEAL_EDIT_ID=id;document.getElementById('d-addr').value=d.address||'';document.getElementById('d-seller').value=d.seller||'';document.getElementById('d-purchase').value=d.purchase||'';document.getElementById('d-arv').value=d.arv||'';document.getElementById('d-rehab').value=d.rehab||'';document.getElementById('d-notes').value=d.notes||'';document.getElementById('deal-modal').classList.add('active')}
-function saveDeal(){const data={address:document.getElementById('d-addr').value.trim(),seller:document.getElementById('d-seller').value.trim(),purchase:+document.getElementById('d-purchase').value||0,arv:+document.getElementById('d-arv').value||0,rehab:+document.getElementById('d-rehab').value||0,notes:document.getElementById('d-notes').value.trim()};if(DEAL_EDIT_ID){const d=PIPELINE.find(x=>x.id===DEAL_EDIT_ID);Object.assign(d,data);d.updatedAt=Date.now()}else{PIPELINE.push({id:'d'+Date.now()+Math.random().toString(36).slice(2,6),stage:'prospecto',createdAt:Date.now(),updatedAt:Date.now(),...data})}saveJSON('jdps.pipeline.v1',PIPELINE);closeModal('deal-modal');renderKanban()}
+function editDeal(id){const d=PIPELINE.find(x=>x.id===id);if(!d)return;DEAL_EDIT_ID=id;document.getElementById('d-addr').value=d.address||'';document.getElementById('d-seller').value=d.seller||'';document.getElementById('d-purchase').value=d.purchase?Number(d.purchase).toLocaleString('en-US'):'';document.getElementById('d-arv').value=d.arv?Number(d.arv).toLocaleString('en-US'):'';document.getElementById('d-rehab').value=d.rehab?Number(d.rehab).toLocaleString('en-US'):'';document.getElementById('d-notes').value=d.notes||'';document.getElementById('deal-modal').classList.add('active')}
+function saveDeal(){const data={address:document.getElementById('d-addr').value.trim(),seller:document.getElementById('d-seller').value.trim(),purchase:parseNum(document.getElementById('d-purchase').value),arv:parseNum(document.getElementById('d-arv').value),rehab:parseNum(document.getElementById('d-rehab').value),notes:document.getElementById('d-notes').value.trim()};if(DEAL_EDIT_ID){const d=PIPELINE.find(x=>x.id===DEAL_EDIT_ID);Object.assign(d,data);d.updatedAt=Date.now()}else{PIPELINE.push({id:'d'+Date.now()+Math.random().toString(36).slice(2,6),stage:'prospecto',createdAt:Date.now(),updatedAt:Date.now(),...data})}saveJSON('jdps.pipeline.v1',PIPELINE);closeModal('deal-modal');renderKanban()}
 function deleteDeal(id){if(!confirm(LANG==='en'?'Delete this deal?':'¿Eliminar este negocio?'))return;PIPELINE=PIPELINE.filter(x=>x.id!==id);saveJSON('jdps.pipeline.v1',PIPELINE);renderKanban()}
 function exportPipeline(){download('pipeline.json',JSON.stringify(PIPELINE,null,2))}
 
@@ -1023,8 +1076,8 @@ function exportPipeline(){download('pipeline.json',JSON.stringify(PIPELINE,null,
    ============================================================ */
 function renderBuyersList(){const el=document.getElementById('buyers-list');if(!BUYERS.length){el.innerHTML=`<p class="muted small mt-2">${LANG==='en'?'No buyers yet. Click + to add one.':'Aún no hay compradores. Pulsa + para agregar uno.'}</p>`;return}el.innerHTML=BUYERS.map(b=>`<div class="buyer"><div><div class="buyer-name">${escapeHtml(b.name)}</div><div class="buyer-meta">${b.phone?`📞 ${escapeHtml(b.phone)}`:''}${b.email?` · ✉ ${escapeHtml(b.email)}`:''}${b.min||b.max?` · ${fmtCurrency(b.min||0)}–${fmtCurrency(b.max||0)}`:''}</div>${b.areas&&b.areas.length?`<div class="muted small mt-1">${LANG==='en'?'Areas':'Áreas'}: ${b.areas.map(escapeHtml).join(', ')}</div>`:''}${b.tags&&b.tags.length?`<div class="tags">${b.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>`:''}${b.notes?`<div class="muted small mt-1">${escapeHtml(b.notes)}</div>`:''}</div><div class="deal-actions"><button onclick="editBuyer('${b.id}')">${LANG==='en'?'Edit':'Editar'}</button><button onclick="deleteBuyer('${b.id}')">✕</button></div></div>`).join('')}
 function openBuyerModal(){BUYER_EDIT_ID=null;['b-name','b-phone','b-email','b-min','b-max','b-areas','b-tags','b-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('buyer-modal').classList.add('active')}
-function editBuyer(id){const b=BUYERS.find(x=>x.id===id);if(!b)return;BUYER_EDIT_ID=id;document.getElementById('b-name').value=b.name||'';document.getElementById('b-phone').value=b.phone||'';document.getElementById('b-email').value=b.email||'';document.getElementById('b-min').value=b.min||'';document.getElementById('b-max').value=b.max||'';document.getElementById('b-areas').value=(b.areas||[]).join(', ');document.getElementById('b-tags').value=(b.tags||[]).join(', ');document.getElementById('b-notes').value=b.notes||'';document.getElementById('buyer-modal').classList.add('active')}
-function saveBuyer(){const data={name:document.getElementById('b-name').value.trim(),phone:document.getElementById('b-phone').value.trim(),email:document.getElementById('b-email').value.trim(),min:+document.getElementById('b-min').value||0,max:+document.getElementById('b-max').value||0,areas:document.getElementById('b-areas').value.split(',').map(s=>s.trim()).filter(Boolean),tags:document.getElementById('b-tags').value.split(',').map(s=>s.trim()).filter(Boolean),notes:document.getElementById('b-notes').value.trim()};if(!data.name){alert(LANG==='en'?'Name required':'Nombre requerido');return}if(BUYER_EDIT_ID){const b=BUYERS.find(x=>x.id===BUYER_EDIT_ID);Object.assign(b,data)}else{BUYERS.push({id:'b'+Date.now()+Math.random().toString(36).slice(2,6),...data})}saveJSON('jdps.buyers.v1',BUYERS);closeModal('buyer-modal');renderBuyersList()}
+function editBuyer(id){const b=BUYERS.find(x=>x.id===id);if(!b)return;BUYER_EDIT_ID=id;document.getElementById('b-name').value=b.name||'';document.getElementById('b-phone').value=b.phone||'';document.getElementById('b-email').value=b.email||'';document.getElementById('b-min').value=b.min?Number(b.min).toLocaleString('en-US'):'';document.getElementById('b-max').value=b.max?Number(b.max).toLocaleString('en-US'):'';document.getElementById('b-areas').value=(b.areas||[]).join(', ');document.getElementById('b-tags').value=(b.tags||[]).join(', ');document.getElementById('b-notes').value=b.notes||'';document.getElementById('buyer-modal').classList.add('active')}
+function saveBuyer(){const data={name:document.getElementById('b-name').value.trim(),phone:document.getElementById('b-phone').value.trim(),email:document.getElementById('b-email').value.trim(),min:parseNum(document.getElementById('b-min').value),max:parseNum(document.getElementById('b-max').value),areas:document.getElementById('b-areas').value.split(',').map(s=>s.trim()).filter(Boolean),tags:document.getElementById('b-tags').value.split(',').map(s=>s.trim()).filter(Boolean),notes:document.getElementById('b-notes').value.trim()};if(!data.name){alert(LANG==='en'?'Name required':'Nombre requerido');return}if(BUYER_EDIT_ID){const b=BUYERS.find(x=>x.id===BUYER_EDIT_ID);Object.assign(b,data)}else{BUYERS.push({id:'b'+Date.now()+Math.random().toString(36).slice(2,6),...data})}saveJSON('jdps.buyers.v1',BUYERS);closeModal('buyer-modal');renderBuyersList()}
 function deleteBuyer(id){if(!confirm(LANG==='en'?'Delete this buyer?':'¿Eliminar este comprador?'))return;BUYERS=BUYERS.filter(x=>x.id!==id);saveJSON('jdps.buyers.v1',BUYERS);renderBuyersList()}
 function exportBuyers(){download('buyers.json',JSON.stringify(BUYERS,null,2))}
 
@@ -1048,6 +1101,30 @@ function renderScript(){const t=document.getElementById('sc-type').value,tn=docu
    UTILITIES
    ============================================================ */
 function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function parseNum(v){return +String(v==null?'':v).replace(/,/g,'')||0}
+function formatMoneyInput(el){
+  const before=el.value;
+  const caret=el.selectionStart||0;
+  // Allow only digits and one decimal point
+  let raw=before.replace(/[^0-9.]/g,'');
+  const parts=raw.split('.');
+  if(parts.length>2)raw=parts[0]+'.'+parts.slice(1).join('');
+  const [intP,decP]=raw.split('.');
+  const intWithCommas=intP?Number(intP).toLocaleString('en-US'):'';
+  const after=decP!==undefined?intWithCommas+'.'+decP:intWithCommas;
+  el.value=after;
+  // Restore approximate caret position
+  const commasBefore=(after.slice(0,caret).match(/,/g)||[]).length;
+  const oldCommasBefore=(before.slice(0,caret).match(/,/g)||[]).length;
+  const diff=commasBefore-oldCommasBefore;
+  const newPos=Math.max(0,Math.min(after.length,caret+diff));
+  try{el.setSelectionRange(newPos,newPos)}catch(e){}
+  // Trigger re-render of attached calculator
+  if(el.id&&el.id.startsWith('m-'))renderMortgage();
+  else if(el.id==='arv-sqft')renderArv();
+  else if(el.id&&el.id.startsWith('ff-'))renderFixFlip();
+}
+function initMoneyFields(){document.querySelectorAll('input[data-money]').forEach(el=>{if(el.value)formatMoneyInput(el)})}
 function escapeAttr(s){return escapeHtml(s)}
 function copyOut(id){const t=document.getElementById(id).textContent;if(!t)return;navigator.clipboard.writeText(t).then(()=>{const btn=event.target;const old=btn.textContent;btn.textContent=LANG==='en'?'Copied':'Copiado';setTimeout(()=>{btn.textContent=old},1500)}).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta)})}
 function printOut(id){const t=document.getElementById(id).textContent;const w=window.open('','_blank');w.document.write(`<!doctype html><html><head><title>Print</title><style>body{font-family:Georgia,serif;max-width:6.5in;margin:1in auto;line-height:1.6;white-space:pre-wrap}</style></head><body>${escapeHtml(t)}<script>window.print()<\/script></body></html>`);w.document.close()}
@@ -1074,6 +1151,9 @@ function download(name,content,type){const blob=new Blob([content],{type:type||'
   // Restore lang
   try{const saved=localStorage.getItem('jdps.lang');if(saved==='en'||saved==='es')LANG=saved}catch(e){}
   setLang(LANG);
+
+  // Format default values in money fields with commas
+  initMoneyFields();
 })();
 </script>
 
