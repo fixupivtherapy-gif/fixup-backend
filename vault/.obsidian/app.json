@@ -1,0 +1,14 @@
+{
+  "newFileLocation": "current",
+  "attachmentFolderPath": "_attachments",
+  "alwaysUpdateLinks": true,
+  "useMarkdownLinks": false,
+  "newLinkFormat": "shortest",
+  "promptDelete": true,
+  "showLineNumber": true,
+  "showFrontmatter": true,
+  "readableLineLength": true,
+  "strictLineBreaks": false,
+  "useTab": false,
+  "tabSize": 2
+}

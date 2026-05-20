@@ -2,3 +2,8 @@ node_modules
 .env
 fixup.db
 *.log
+
+# Obsidian per-user workspace state (config files are committed)
+vault/.obsidian/workspace*
+vault/.obsidian/cache
+vault/.trash
