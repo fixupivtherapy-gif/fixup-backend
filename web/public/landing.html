@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>JD's Property Solutions</title>
+<meta name="description" content="Plataforma de trabajo para inversionistas y mayoristas en bienes raíces. Calculadoras, contratos en español e inglés, y software para operar el día a día." />
+<meta name="theme-color" content="#F5F1EA" />
+<meta property="og:title" content="JD's Property Solutions" />
+<meta property="og:description" content="Cerramos negocios con claridad y estructura." />
+<meta property="og:type" content="website" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter+Tight:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+<style>
+  :root {
+    --bone: #F5F1EA;
+    --paper: #FAF7F2;
+    --ink: #1A1714;
+    --muted: #6B6358;
+    --muted-soft: #8F8779;
+    --rule: #D9D2C5;
+    --clay: #A8553D;
+    --clay-dark: #8B4632;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bone);
+    color: var(--ink);
+    font-family: 'Inter Tight', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100dvh;
+  }
+
+  /* Paper-grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  .layer { position: relative; z-index: 1; }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--rule);
+    background: rgba(245, 241, 234, 0.85);
+    backdrop-filter: saturate(140%) blur(4px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 3.5rem;
+  }
+
+  /* WORDMARK */
+  .wordmark {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.375rem;
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .wordmark .apostrophe { color: var(--clay); }
+  .wordmark .subtitle {
+    font-family: 'Inter Tight', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    font-size: 0.6875rem;
+    margin-left: 0.25rem;
+  }
+
+  /* LANGUAGE TOGGLE */
+  .lang-toggle {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+  .lang-toggle button {
+    background: none;
+    border: 0;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0.125rem 0.375rem;
+    font: inherit;
+    text-transform: inherit;
+    letter-spacing: inherit;
+    transition: color 150ms ease;
+  }
+  .lang-toggle button[aria-pressed="true"] { color: var(--clay); }
+  .lang-toggle button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+  .lang-toggle .sep { color: var(--muted-soft); }
+
+  /* HERO */
+  main { padding: 3.5rem 0 4.5rem; }
+  .hero { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; }
+
+  .marker {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin: 0 0 1.25rem;
+  }
+
+  .hero-text { grid-column: 1 / -1; }
+
+  h1.headline {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2.25rem, 7vw, 4.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    margin: 0;
+    color: var(--ink);
+  }
+  h1.headline em {
+    font-style: italic;
+    color: var(--clay);
+    font-weight: 400;
+  }
+
+  .body-copy {
+    margin: 1.75rem 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--muted);
+    max-width: 38rem;
+  }
+
+  /* ASIDE — trust block */
+  .trust {
+    grid-column: 1 / -1;
+    border-left: 1px solid var(--rule);
+    padding: 0 0 0 1.25rem;
+    margin-top: 2rem;
+  }
+  .eyebrow {
+    font-family: 'Inter Tight', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.6875rem;
+    color: var(--muted);
+    margin: 0 0 0.875rem;
+  }
+  .trust ul { list-style: none; margin: 0; padding: 0; }
+  .trust li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    font-size: 0.9375rem;
+    color: var(--ink);
+    padding: 0.375rem 0;
+  }
+  .trust li::before {
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    background: no-repeat center / 1rem 1rem url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8553D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+  }
+
+  /* CTA buttons */
+  .actions {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 3rem;
+    padding: 0 1.5rem;
+    border-radius: 4px;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    border: 1px solid;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+  .btn-primary {
+    background: var(--clay);
+    color: var(--paper);
+    border-color: var(--clay);
+  }
+  .btn-primary:hover { background: var(--clay-dark); border-color: var(--clay-dark); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--rule);
+  }
+  .btn-secondary:hover { border-color: rgba(26, 23, 20, 0.4); background: var(--paper); }
+
+  /* Status pill */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--clay);
+    background: rgba(168, 85, 61, 0.07);
+    border: 1px solid rgba(168, 85, 61, 0.25);
+    padding: 0.375rem 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1.75rem;
+  }
+  .status::before {
+    content: '';
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 50%;
+    background: var(--clay);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* SECTION — what's inside */
+  .features {
+    margin-top: 5rem;
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+  }
+  .section-label {
+    font-family: 'Inter Tight', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.6875rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+  .feature-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .feature-list li {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .feature-num {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--clay);
+  }
+  .feature-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.375rem;
+    color: var(--ink);
+    margin: 0;
+    font-weight: 400;
+  }
+  .feature-summary {
+    color: var(--muted);
+    font-size: 0.9375rem;
+    margin: 0.375rem 0 0;
+    line-height: 1.55;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--rule);
+    margin-top: 4rem;
+    padding: 2.5rem 0;
+  }
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .footer-row p {
+    margin: 0;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+
+  /* MEDIUM SCREENS */
+  @media (min-width: 768px) {
+    .hero-text { grid-column: 1 / span 8; }
+    .trust {
+      grid-column: 9 / span 4;
+      margin-top: 6.5rem;
+    }
+    main { padding: 5.5rem 0 5rem; }
+  }
+
+  /* i18n visibility — controlled by html[lang] */
+  [data-lang] { display: none; }
+  html[lang="es"] [data-lang="es"] { display: revert; }
+  html[lang="en"] [data-lang="en"] { display: revert; }
+
+  /* Inline alts that need to be inline */
+  span[data-lang] { display: none; }
+  html[lang="es"] span[data-lang="es"] { display: inline; }
+  html[lang="en"] span[data-lang="en"] { display: inline; }
+
+  /* Selection */
+  ::selection { background: var(--clay); color: var(--paper); }
+</style>
+</head>
+<body>
+
+<div class="layer">
+
+  <header>
+    <div class="container header-row">
+      <a class="wordmark" href="#">
+        <span>JD</span><span class="apostrophe">&rsquo;</span><span>s</span>
+        <span class="subtitle">Property Solutions</span>
+      </a>
+
+      <nav class="lang-toggle" aria-label="Language">
+        <button type="button" id="lang-es" aria-pressed="true">ES</button>
+        <span class="sep" aria-hidden="true">/</span>
+        <button type="button" id="lang-en" aria-pressed="false">EN</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <div class="hero-text">
+        <p class="marker" data-lang="es">— 01 / Plataforma de mayoreo</p>
+        <p class="marker" data-lang="en">— 01 / Wholesale platform</p>
+
+        <div class="status">
+          <span data-lang="es">Próximamente</span>
+          <span data-lang="en">Coming soon</span>
+        </div>
+
+        <h1 class="headline" data-lang="es">
+          Cerramos negocios con <em>claridad y estructura.</em>
+        </h1>
+        <h1 class="headline" data-lang="en">
+          We close deals with <em>clarity and structure.</em>
+        </h1>
+
+        <p class="body-copy" data-lang="es">
+          Plataforma de trabajo para inversionistas y mayoristas en bienes raíces.
+          Calculadoras, contratos en español e inglés, y software para operar el día a día.
+        </p>
+        <p class="body-copy" data-lang="en">
+          A working platform for real estate investors and wholesalers.
+          Calculators, contracts in Spanish and English, and software to operate day-to-day.
+        </p>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="mailto:contacto@jdspropertysolutions.com">
+            <span data-lang="es">Notifícame al lanzar</span>
+            <span data-lang="en">Notify me at launch</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <aside class="trust">
+        <p class="eyebrow" data-lang="es">Construido para operar</p>
+        <p class="eyebrow" data-lang="en">Built to operate</p>
+        <ul>
+          <li data-lang="es">Contratos en ambos idiomas</li>
+          <li data-lang="en">Contracts in both languages</li>
+          <li data-lang="es">Análisis de fotos con IA</li>
+          <li data-lang="en">AI photo analysis</li>
+          <li data-lang="es">USD y formato bilingüe</li>
+          <li data-lang="en">USD and bilingual formatting</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="features">
+      <p class="section-label" data-lang="es">Herramientas</p>
+      <p class="section-label" data-lang="en">Tools</p>
+
+      <ul class="feature-list">
+        <li>
+          <span class="feature-num">01</span>
+          <div>
+            <h3 class="feature-title" data-lang="es">Calculadoras</h3>
+            <h3 class="feature-title" data-lang="en">Calculators</h3>
+            <p class="feature-summary" data-lang="es">
+              Estimador de rehab &middot; ARV &middot; Fix &amp; Flip &middot; Sección 8 &middot; Subject-to &middot; Financiamiento del vendedor.
+            </p>
+            <p class="feature-summary" data-lang="en">
+              Rehab estimator &middot; ARV &middot; Fix &amp; Flip &middot; Section 8 &middot; Subject-to &middot; Seller financing.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="feature-num">02</span>
+          <div>
+            <h3 class="feature-title" data-lang="es">Recursos</h3>
+            <h3 class="feature-title" data-lang="en">Resources</h3>
+            <p class="feature-summary" data-lang="es">
+              Diccionario bilingüe de 350+ términos &middot; Contratos en español e inglés &middot; Generador de contratos.
+            </p>
+            <p class="feature-summary" data-lang="en">
+              Bilingual dictionary of 350+ terms &middot; Contracts in Spanish and English &middot; Contract generator.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="feature-num">03</span>
+          <div>
+            <h3 class="feature-title" data-lang="es">Software</h3>
+            <h3 class="feature-title" data-lang="en">Software</h3>
+            <p class="feature-summary" data-lang="es">
+              Pipeline de negocios &middot; Lista de compradores &middot; Skip trace &middot; Cartas directas &middot; Scripts de llamadas.
+            </p>
+            <p class="feature-summary" data-lang="en">
+              Deal pipeline &middot; Buyers list &middot; Skip trace &middot; Direct mail &middot; Cold call scripts.
+            </p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container footer-row">
+      <a class="wordmark" href="#" style="font-size: 0.9375rem;">
+        <span>JD</span><span class="apostrophe">&rsquo;</span><span>s</span>
+        <span class="subtitle">Property Solutions</span>
+      </a>
+      <p data-lang="es">&copy; 2026 &middot; Todos los derechos reservados</p>
+      <p data-lang="en">&copy; 2026 &middot; All rights reserved</p>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var html = document.documentElement;
+    var btnEs = document.getElementById('lang-es');
+    var btnEn = document.getElementById('lang-en');
+
+    function setLang(lang) {
+      html.setAttribute('lang', lang);
+      btnEs.setAttribute('aria-pressed', String(lang === 'es'));
+      btnEn.setAttribute('aria-pressed', String(lang === 'en'));
+      try { localStorage.setItem('jdps.lang', lang); } catch (_) {}
+    }
+
+    btnEs.addEventListener('click', function () { setLang('es'); });
+    btnEn.addEventListener('click', function () { setLang('en'); });
+
+    try {
+      var saved = localStorage.getItem('jdps.lang');
+      if (saved === 'en' || saved === 'es') setLang(saved);
+    } catch (_) {}
+  })();
+</script>
+
+</body>
+</html>
