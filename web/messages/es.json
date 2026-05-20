@@ -1,0 +1,126 @@
+{
+  "brand": {
+    "name": "JD's Property Solutions",
+    "tagline": "Cerramos negocios con claridad y estructura.",
+    "subline": "Plataforma de trabajo para inversionistas y mayoristas en bienes raíces."
+  },
+  "nav": {
+    "home": "Inicio",
+    "tools": "Herramientas",
+    "calculadoras": "Calculadoras",
+    "recursos": "Recursos",
+    "software": "Software",
+    "language": "Idioma"
+  },
+  "common": {
+    "open": "Abrir",
+    "back": "Volver",
+    "download": "Descargar",
+    "generate": "Generar",
+    "calculate": "Calcular",
+    "reset": "Limpiar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "loading": "Cargando…",
+    "search": "Buscar",
+    "all": "Todas",
+    "es": "Español",
+    "en": "Inglés"
+  },
+  "home": {
+    "eyebrow": "Plataforma de mayoreo",
+    "intro1": "Cerramos negocios con",
+    "intro2": "claridad y estructura.",
+    "introBody": "Herramienta de trabajo para inversionistas y mayoristas en bienes raíces. Calculadoras, contratos en español e inglés, y software para operar el día a día.",
+    "ctaPrimary": "Abrir herramientas",
+    "ctaSecondary": "Ver diccionario",
+    "sectionLabel": "Herramientas",
+    "tiles": {
+      "calculadoras": {
+        "title": "Calculadoras",
+        "summary": "Estimador de rehab · ARV · Fix & Flip · Sección 8 · Subject-to · Financiamiento del vendedor."
+      },
+      "recursos": {
+        "title": "Recursos",
+        "summary": "Diccionario bilingüe de 350+ términos · Contratos en español e inglés · Generador de contratos."
+      },
+      "software": {
+        "title": "Software",
+        "summary": "Pipeline de negocios · Lista de compradores · Skip trace · Cartas directas · Scripts de llamadas."
+      }
+    },
+    "trust": {
+      "label": "Construido para operar",
+      "items": [
+        "Contratos en ambos idiomas",
+        "Análisis de fotos con IA",
+        "USD y formato bilingüe"
+      ]
+    }
+  },
+  "calculadoras": {
+    "title": "Calculadoras",
+    "subtitle": "Estimadores y analizadores para evaluar negocios en minutos.",
+    "groups": {
+      "quick": "Calculadoras rápidas",
+      "deals": "Analizadores de negocios"
+    },
+    "tools": {
+      "rehab": {
+        "title": "Estimador de rehabilitación",
+        "summary": "Sube fotos de la propiedad y obtén un desglose con rangos de costo en USD."
+      },
+      "arv": {
+        "title": "Calculadora de ARV",
+        "summary": "Valor estimado después de reparaciones con base en comparables."
+      },
+      "mortgage": {
+        "title": "Calculadora de hipoteca",
+        "summary": "Pago mensual de principal e interés con vista de amortización."
+      },
+      "fixflip": {
+        "title": "Calculadora Fix & Flip",
+        "summary": "ARV, costos, MAO con regla del 70% ajustable, ganancia y ROI."
+      },
+      "section8": {
+        "title": "Calculadora Sección 8",
+        "summary": "FMR del área, gastos, flujo de caja, cap rate y cash-on-cash."
+      },
+      "seller": {
+        "title": "Financiamiento del vendedor",
+        "summary": "Estructura ofertas creativas con enganche, interés, plazo y balloon."
+      },
+      "subto": {
+        "title": "Subject-To (asumir hipoteca)",
+        "summary": "Plusvalía, obligación mensual y flujo de caja al rentar."
+      },
+      "sheets": {
+        "title": "Hojas de cálculo clásicas",
+        "summary": "BRRRR, asignación de mayorista, novación — plantillas listas."
+      }
+    }
+  },
+  "recursos": {
+    "title": "Recursos",
+    "subtitle": "Diccionario bilingüe y contratos descargables.",
+    "groups": {
+      "dictionary": "Diccionario",
+      "contracts": "Contratos",
+      "generator": "Generador"
+    }
+  },
+  "software": {
+    "title": "Software",
+    "subtitle": "Operación día a día: pipeline, compradores y outreach.",
+    "groups": {
+      "pipeline": "Pipeline",
+      "buyers": "Compradores",
+      "outreach": "Outreach"
+    }
+  },
+  "footer": {
+    "tagline": "Plataforma de trabajo para wholesalers e inversionistas.",
+    "rights": "Todos los derechos reservados."
+  }
+}

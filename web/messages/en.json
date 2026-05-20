@@ -1,0 +1,126 @@
+{
+  "brand": {
+    "name": "JD's Property Solutions",
+    "tagline": "We close deals with clarity and structure.",
+    "subline": "A working platform for real estate investors and wholesalers."
+  },
+  "nav": {
+    "home": "Home",
+    "tools": "Tools",
+    "calculadoras": "Calculators",
+    "recursos": "Resources",
+    "software": "Software",
+    "language": "Language"
+  },
+  "common": {
+    "open": "Open",
+    "back": "Back",
+    "download": "Download",
+    "generate": "Generate",
+    "calculate": "Calculate",
+    "reset": "Reset",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "loading": "Loading…",
+    "search": "Search",
+    "all": "All",
+    "es": "Spanish",
+    "en": "English"
+  },
+  "home": {
+    "eyebrow": "Wholesale platform",
+    "intro1": "We close deals with",
+    "intro2": "clarity and structure.",
+    "introBody": "A working tool for real estate investors and wholesalers. Calculators, contracts in Spanish and English, and software to operate day-to-day.",
+    "ctaPrimary": "Open tools",
+    "ctaSecondary": "View dictionary",
+    "sectionLabel": "Tools",
+    "tiles": {
+      "calculadoras": {
+        "title": "Calculators",
+        "summary": "Rehab estimator · ARV · Fix & Flip · Section 8 · Subject-to · Seller financing."
+      },
+      "recursos": {
+        "title": "Resources",
+        "summary": "Bilingual dictionary of 350+ terms · Contracts in Spanish and English · Contract generator."
+      },
+      "software": {
+        "title": "Software",
+        "summary": "Deal pipeline · Buyers list · Skip trace · Direct mail · Cold call scripts."
+      }
+    },
+    "trust": {
+      "label": "Built to operate",
+      "items": [
+        "Contracts in both languages",
+        "AI photo analysis",
+        "USD and bilingual formatting"
+      ]
+    }
+  },
+  "calculadoras": {
+    "title": "Calculators",
+    "subtitle": "Estimators and analyzers to evaluate deals in minutes.",
+    "groups": {
+      "quick": "Quick calculators",
+      "deals": "Deal analyzers"
+    },
+    "tools": {
+      "rehab": {
+        "title": "Rehab estimator",
+        "summary": "Upload property photos and get an itemized estimate with USD cost ranges."
+      },
+      "arv": {
+        "title": "ARV calculator",
+        "summary": "After-repair value estimate based on comparables."
+      },
+      "mortgage": {
+        "title": "Mortgage calculator",
+        "summary": "Monthly P&I payment with amortization preview."
+      },
+      "fixflip": {
+        "title": "Fix & Flip calculator",
+        "summary": "ARV, costs, MAO with adjustable 70% rule, profit and ROI."
+      },
+      "section8": {
+        "title": "Section 8 calculator",
+        "summary": "Area FMR, expenses, cash flow, cap rate and cash-on-cash."
+      },
+      "seller": {
+        "title": "Seller financing",
+        "summary": "Structure creative offers with down payment, interest, term, balloon."
+      },
+      "subto": {
+        "title": "Subject-To (loan assumption)",
+        "summary": "Equity, monthly obligation, and rental cash flow."
+      },
+      "sheets": {
+        "title": "Classic spreadsheets",
+        "summary": "BRRRR, wholesaler assignment, novation — ready-to-use templates."
+      }
+    }
+  },
+  "recursos": {
+    "title": "Resources",
+    "subtitle": "Bilingual dictionary and downloadable contracts.",
+    "groups": {
+      "dictionary": "Dictionary",
+      "contracts": "Contracts",
+      "generator": "Generator"
+    }
+  },
+  "software": {
+    "title": "Software",
+    "subtitle": "Day-to-day operation: pipeline, buyers, and outreach.",
+    "groups": {
+      "pipeline": "Pipeline",
+      "buyers": "Buyers",
+      "outreach": "Outreach"
+    }
+  },
+  "footer": {
+    "tagline": "A working platform for wholesalers and investors.",
+    "rights": "All rights reserved."
+  }
+}
