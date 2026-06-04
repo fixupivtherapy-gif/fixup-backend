@@ -57,6 +57,14 @@ sync across devices (phone + laptop, etc.), connect Google Drive:
 - **New device:** install/open the app there, click **Connect**, and it
   detects the existing `ponce-properties.json` and offers to import & merge
   it with whatever is on that device (no duplicates — newest edit wins).
+- **Deletes propagate.** When you delete a pin, a small *tombstone*
+  (just its id + timestamp) is recorded in the synced file, so the deletion
+  is mirrored on your other devices instead of the pin reappearing on the
+  next merge. A pin *edited* after it was deleted elsewhere is kept
+  (the later action wins). Tombstones are pruned automatically after
+  180 days. The synced file is therefore an object
+  (`{ "properties": [...], "tombstones": [...] }`); the older bare-array
+  format is still read for backward compatibility.
 - **Offline:** changes keep saving locally; the app uploads automatically
   once the connection returns.
 

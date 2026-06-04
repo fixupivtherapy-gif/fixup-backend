@@ -178,15 +178,16 @@
     return cachedFileId;
   }
 
-  // Download remote data → array (or null if no file yet).
+  // Download the remote payload as-is (array [legacy] or
+  // { properties, tombstones }). Returns null if no file exists yet.
+  // The app normalizes the shape and handles merging.
   async function pull() {
     const id = await findFileId();
     if (!id) return null;
     const res = await api("https://www.googleapis.com/drive/v3/files/" + id + "?alt=media");
     const text = await res.text();
     try {
-      const parsed = JSON.parse(text);
-      return Array.isArray(parsed) ? parsed : (parsed.properties || null);
+      return JSON.parse(text);
     } catch (e) {
       return null;
     }

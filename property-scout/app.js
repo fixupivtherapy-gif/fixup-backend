@@ -23,8 +23,12 @@
     (STATUSES.find((s) => s.name === status) || STATUSES[0]).color;
 
   // ── State ───────────────────────────────────────────────────
+  const _state = load();
   /** @type {Array<Object>} */
-  let properties = load();
+  let properties = _state.properties;
+  /** @type {Array<{id:string, deletedAt:string}>} — deletion markers so
+      removals propagate across devices instead of resurrecting on merge. */
+  let tombstones = _state.tombstones;
   const markers = new Map();   // id -> L.marker
   let pendingImages = [];       // base64 strings while editing
   let searchTerm = "";
@@ -64,17 +68,29 @@
   };
 
   // ── Storage ─────────────────────────────────────────────────
+  // Normalize any stored/remote shape into { properties, tombstones }.
+  // Accepts the legacy bare-array format for backward compatibility.
+  function normalizeState(raw) {
+    if (Array.isArray(raw)) return { properties: raw, tombstones: [] };
+    if (raw && typeof raw === "object") {
+      return {
+        properties: Array.isArray(raw.properties) ? raw.properties : [],
+        tombstones: Array.isArray(raw.tombstones) ? raw.tombstones : [],
+      };
+    }
+    return { properties: [], tombstones: [] };
+  }
   function load() {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      return normalizeState(JSON.parse(localStorage.getItem(STORAGE_KEY)));
     } catch (e) {
       console.warn("Could not parse stored properties:", e);
-      return [];
+      return { properties: [], tombstones: [] };
     }
   }
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ properties, tombstones }));
     } catch (e) {
       alert(
         "Storage limit reached. Try removing some photos or older properties.\n\n" + e.message
@@ -246,11 +262,21 @@
   function removeProperty(id) {
     if (!confirm("Delete this property and its photos?")) return;
     properties = properties.filter((p) => p.id !== id);
+    recordTombstone(id);
     const m = markers.get(id);
     if (m) { map.removeLayer(m); markers.delete(id); }
     save();
     renderList();
     closeForm();
+  }
+
+  // Mark an id as deleted so other devices remove it too (instead of
+  // re-adding it on the next merge).
+  function recordTombstone(id) {
+    const now = new Date().toISOString();
+    const ex = tombstones.find((t) => t.id === id);
+    if (ex) ex.deletedAt = now;
+    else tombstones.push({ id, deletedAt: now });
   }
 
   // ── Sidebar list ────────────────────────────────────────────
@@ -411,18 +437,58 @@
     renderList();
   }
 
-  // Non-destructive merge: union by id, newest updatedAt wins.
-  // Returns { merged, added, updated } so we can tell the user.
-  function mergeProperties(local, remote) {
-    const byId = new Map(local.map((p) => [p.id, p]));
-    let added = 0, updated = 0;
-    (remote || []).forEach((r) => {
+  // How long to keep tombstones before pruning (days). Long enough for
+  // every device to have synced and dropped the deleted record.
+  const TOMBSTONE_TTL_DAYS = 180;
+
+  // Merge two { properties, tombstones } states. Union by id with
+  // newest-wins on properties; deletions (tombstones) and edits race by
+  // timestamp, so a delete on one device removes the pin everywhere,
+  // while an edit made *after* a delete resurrects it.
+  // Returns the merged state plus { added, updated, removed } vs `local`.
+  function mergeState(local, remote) {
+    // 1. Union tombstones — newest deletedAt wins.
+    const tomb = new Map();
+    const addTomb = (t) => {
+      if (!t || !t.id) return;
+      const ex = tomb.get(t.id);
+      if (!ex || (t.deletedAt || "") > (ex.deletedAt || "")) {
+        tomb.set(t.id, { id: t.id, deletedAt: t.deletedAt || "" });
+      }
+    };
+    local.tombstones.forEach(addTomb);
+    remote.tombstones.forEach(addTomb);
+
+    // 2. Union properties — newest updatedAt wins.
+    const localById = new Map(local.properties.map((p) => [p.id, p]));
+    const props = new Map(localById);
+    remote.properties.forEach((r) => {
       if (!r || !r.id) return;
-      const ex = byId.get(r.id);
-      if (!ex) { byId.set(r.id, r); added++; }
-      else if ((r.updatedAt || "") > (ex.updatedAt || "")) { byId.set(r.id, r); updated++; }
+      const ex = props.get(r.id);
+      if (!ex || (r.updatedAt || "") > (ex.updatedAt || "")) props.set(r.id, r);
     });
-    return { merged: [...byId.values()], added, updated };
+
+    // 3. Apply tombstones. A pin edited after its deletion is resurrected
+    //    (and its tombstone dropped); otherwise the pin is removed.
+    tomb.forEach((t, id) => {
+      const p = props.get(id);
+      if (p && (p.updatedAt || "") > (t.deletedAt || "")) tomb.delete(id);
+      else if (p) props.delete(id);
+    });
+
+    // 4. Prune tombstones older than the TTL to bound file growth.
+    const cutoff = new Date(Date.now() - TOMBSTONE_TTL_DAYS * 864e5).toISOString();
+    const tombstonesOut = [...tomb.values()].filter((t) => (t.deletedAt || "") >= cutoff);
+
+    // 5. Tally changes relative to the local state, for the prompt.
+    let added = 0, updated = 0, removed = 0;
+    props.forEach((p, id) => {
+      if (!localById.has(id)) added++;
+      else if (p !== localById.get(id)) updated++;
+    });
+    localById.forEach((_, id) => { if (!props.has(id)) removed++; });
+
+    return { properties: [...props.values()], tombstones: tombstonesOut, added, updated, removed };
   }
 
   function updateSyncUI() {
@@ -449,23 +515,26 @@
   // Pull remote data, offer to merge it in, then push the result back
   // so Drive holds the union. promptUser=false runs silently on resume.
   async function pullMergePush(promptUser) {
-    let remote = null;
+    let remoteRaw = null;
     try {
-      remote = await GDriveSync.pull();
+      remoteRaw = await GDriveSync.pull();
     } catch (e) {
       onSyncStatus("error", "Couldn't read Drive");
       return;
     }
-    if (remote && remote.length) {
-      const preview = mergeProperties(properties, remote);
-      const changes = preview.added + preview.updated;
+    const remote = normalizeState(remoteRaw);
+    if (remote.properties.length || remote.tombstones.length) {
+      const result = mergeState({ properties, tombstones }, remote);
+      const changes = result.added + result.updated + result.removed;
       const go = !promptUser || changes === 0 ||
         confirm(
-          `Found ${remote.length} propert${remote.length === 1 ? "y" : "ies"} in Google Drive.\n` +
-          `Import ${preview.added} new and update ${preview.updated} existing on this device?`
+          "Google Drive has changes from another device.\n" +
+          `Import ${result.added} new, update ${result.updated}, ` +
+          `and remove ${result.removed} deleted elsewhere?`
         );
       if (go && changes > 0) {
-        properties = preview.merged;
+        properties = result.properties;
+        tombstones = result.tombstones;
         save();           // persists locally + queues an upload
         rebuildAll();
       }
@@ -497,7 +566,7 @@
 
     GDriveSync.init({
       onStatus: onSyncStatus,
-      getData: () => properties,
+      getData: () => ({ properties, tombstones }),
     });
 
     els.connectDriveBtn.onclick = handleConnect;
