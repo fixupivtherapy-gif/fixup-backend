@@ -19,7 +19,7 @@
 
   // Paste your Google OAuth Client ID here to bake it into the build,
   // or leave blank and enter it once in the app (stored in localStorage).
-  const HARDCODED_CLIENT_ID = "";
+  const HARDCODED_CLIENT_ID = "691500099904-u676vul0ki3mqjmdir8ivujrtu8tcjte.apps.googleusercontent.com";
 
   const TOKEN_KEY = "gdrive_token_v1";
   const CLIENT_ID_KEY = "gdrive_client_id";
