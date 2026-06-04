@@ -293,9 +293,7 @@
     if (!p) return;
     map.setView([p.lat, p.lng], Math.max(map.getZoom(), 15), { animate: true });
     markers.get(id)?.openPopup();
-    if (window.matchMedia("(max-width: 768px)").matches) {
-      els.sidebar.classList.add("collapsed");
-    }
+    if (isMobile()) els.sidebar.classList.remove("open"); // close overlay
   }
 
   function renderLegend() {
@@ -379,7 +377,11 @@
     }
   });
   els.toggleSidebar.onclick = () => {
-    els.sidebar.classList.toggle("collapsed");
+    if (isMobile()) {
+      els.sidebar.classList.toggle("open");   // slides over the map
+    } else {
+      els.sidebar.classList.toggle("collapsed");
+    }
     // map width may change on desktop; let Leaflet re-measure
     setTimeout(() => map.invalidateSize(), 260);
   };
@@ -395,8 +397,8 @@
   properties.forEach(addMarker);
   renderList();
 
-  // On phones, hide the sidebar by default so the map fills the screen.
-  if (isMobile()) els.sidebar.classList.add("collapsed");
+  // Map initialised successfully — drop the "needs JavaScript" fallback.
+  document.getElementById("mapFallback")?.remove();
 
   // Leaflet must re-measure once layout has settled, otherwise tiles
   // can fail to fill the container (common when loaded inside a viewer).

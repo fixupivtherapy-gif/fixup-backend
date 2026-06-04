@@ -47,7 +47,14 @@
 
     <!-- ───────────── Map ───────────── -->
     <main class="map-wrap">
-      <div id="map"></div>
+      <div id="map">
+        <div class="map-fallback" id="mapFallback">
+          <noscript>
+            <strong>This app needs JavaScript.</strong><br>
+            Open this file in Safari or Chrome to load the map.
+          </noscript>
+        </div>
+      </div>
       <div class="map-hint" id="mapHint">Tap the map to add a property</div>
     </main>
   </div>
