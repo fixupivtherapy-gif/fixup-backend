@@ -68,6 +68,7 @@ html, body {
 .layout {
   display: flex;
   height: calc(100% - var(--header-h));
+  position: relative;
 }
 .sidebar {
   width: 320px;
@@ -77,9 +78,25 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: margin-left .25s ease;
+  transition: margin-left .25s ease, transform .25s ease;
 }
 .sidebar.collapsed { margin-left: -320px; }
+
+/* On phones/tablets the sidebar floats OVER the map instead of squeezing it,
+   and starts hidden so the map gets the full screen. */
+@media (max-width: 768px) {
+  .sidebar {
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    z-index: 1100;
+    width: 86%;
+    max-width: 340px;
+    flex-basis: auto;
+    margin-left: 0;
+    box-shadow: var(--shadow);
+  }
+  .sidebar.collapsed { margin-left: 0; transform: translateX(-105%); }
+}
 
 .sidebar-head { padding: 12px; border-bottom: 1px solid var(--line); }
 .search {

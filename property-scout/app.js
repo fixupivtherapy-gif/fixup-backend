@@ -378,14 +378,31 @@
       else if (!els.overlay.hidden) closeForm();
     }
   });
-  els.toggleSidebar.onclick = () => els.sidebar.classList.toggle("collapsed");
+  els.toggleSidebar.onclick = () => {
+    els.sidebar.classList.toggle("collapsed");
+    // map width may change on desktop; let Leaflet re-measure
+    setTimeout(() => map.invalidateSize(), 260);
+  };
   els.search.addEventListener("input", (e) => {
     searchTerm = e.target.value;
     renderList();
   });
 
   // ── Boot ────────────────────────────────────────────────────
+  const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
+
   renderLegend();
   properties.forEach(addMarker);
   renderList();
+
+  // On phones, hide the sidebar by default so the map fills the screen.
+  if (isMobile()) els.sidebar.classList.add("collapsed");
+
+  // Leaflet must re-measure once layout has settled, otherwise tiles
+  // can fail to fill the container (common when loaded inside a viewer).
+  const fixSize = () => map.invalidateSize();
+  window.addEventListener("resize", fixSize);
+  window.addEventListener("orientationchange", () => setTimeout(fixSize, 300));
+  setTimeout(fixSize, 200);
+  setTimeout(fixSize, 600);
 })();
