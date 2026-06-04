@@ -43,6 +43,20 @@
       <p id="emptyState" class="empty-state">
         Tap anywhere on the map to drop your first pin.
       </p>
+
+      <!-- ─────── Google Drive sync ─────── -->
+      <div class="sidebar-foot" id="syncFoot">
+        <button id="connectDriveBtn" class="btn btn-ghost btn-block" title="Back up &amp; sync across devices">
+          <span class="gdrive-mark">☁️</span> Connect Google Drive
+        </button>
+        <div id="syncConnected" class="sync-connected" hidden>
+          <span class="sync-account">Drive sync on</span>
+          <div class="sync-connected-actions">
+            <button id="syncNowBtn" class="btn btn-ghost btn-sm" title="Sync now">↻ Sync now</button>
+            <button id="disconnectDriveBtn" class="btn btn-ghost btn-sm" title="Disconnect Google Drive">Disconnect</button>
+          </div>
+        </div>
+      </div>
     </aside>
 
     <!-- ───────────── Map ───────────── -->
@@ -56,6 +70,12 @@
         </div>
       </div>
       <div class="map-hint" id="mapHint">Tap the map to add a property</div>
+
+      <!-- ─────── Sync status indicator ─────── -->
+      <div id="syncStatus" class="sync-status" hidden role="status" aria-live="polite" title="Google Drive sync status">
+        <span id="syncDot" class="sync-dot"></span>
+        <span id="syncLabel" class="sync-label"></span>
+      </div>
     </main>
   </div>
 
@@ -118,12 +138,51 @@
     <img id="lightboxImg" alt="Property photo" />
   </div>
 
+  <!-- ───────────── Google Drive setup modal ───────────── -->
+  <div id="setupOverlay" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+      <div class="modal-head">
+        <h2 id="setupTitle">Connect Google Drive</h2>
+        <button id="setupClose" class="icon-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="form">
+        <p class="setup-note">
+          Drive sync backs up your pins and keeps them in step across devices.
+          It's optional — the app works fully offline without it.
+        </p>
+        <p class="setup-note">
+          One-time setup: create a free <strong>Google OAuth Client ID</strong>
+          (Web application) in the
+          <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Google Cloud Console</a>,
+          enable the <strong>Google Drive API</strong>, and add this site's address
+          under “Authorized JavaScript origins.” Paste the Client ID below.
+          See the <strong>README</strong> for step-by-step instructions.
+        </p>
+        <label class="field">
+          <span class="field-label">Google OAuth Client ID</span>
+          <input id="clientIdInput" type="text" placeholder="1234567890-abcd.apps.googleusercontent.com" autocomplete="off" spellcheck="false" />
+        </label>
+        <div class="modal-actions">
+          <div class="spacer"></div>
+          <button type="button" id="setupCancel" class="btn btn-ghost">Cancel</button>
+          <button type="button" id="setupSave" class="btn btn-primary">Save &amp; connect</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Leaflet JS -->
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
+
+  <!-- Google Identity Services (OAuth 2.0) — loads async; the app
+       stays usable offline if this never arrives. -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <script src="gdrive-sync.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

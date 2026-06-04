@@ -52,6 +52,15 @@
     deleteBtn: $("deleteBtn"), cancelBtn: $("cancelBtn"),
     // lightbox
     lightbox: $("lightbox"), lightboxImg: $("lightboxImg"),
+    // google drive sync
+    connectDriveBtn: $("connectDriveBtn"),
+    syncConnected: $("syncConnected"),
+    syncNowBtn: $("syncNowBtn"),
+    disconnectDriveBtn: $("disconnectDriveBtn"),
+    syncStatus: $("syncStatus"), syncDot: $("syncDot"), syncLabel: $("syncLabel"),
+    // setup modal
+    setupOverlay: $("setupOverlay"), setupClose: $("setupClose"),
+    setupCancel: $("setupCancel"), setupSave: $("setupSave"), clientIdInput: $("clientIdInput"),
   };
 
   // ── Storage ─────────────────────────────────────────────────
@@ -71,6 +80,8 @@
         "Storage limit reached. Try removing some photos or older properties.\n\n" + e.message
       );
     }
+    // Back up to Google Drive when connected (debounced, offline-safe).
+    if (window.GDriveSync) GDriveSync.queueSync();
   }
 
   // ── Map setup ───────────────────────────────────────────────
@@ -390,12 +401,146 @@
     renderList();
   });
 
+  // ── Google Drive sync ───────────────────────────────────────
+  // Redraw every marker + the list after data changes wholesale
+  // (e.g. an import/merge from Drive).
+  function rebuildAll() {
+    markers.forEach((m) => map.removeLayer(m));
+    markers.clear();
+    properties.forEach(addMarker);
+    renderList();
+  }
+
+  // Non-destructive merge: union by id, newest updatedAt wins.
+  // Returns { merged, added, updated } so we can tell the user.
+  function mergeProperties(local, remote) {
+    const byId = new Map(local.map((p) => [p.id, p]));
+    let added = 0, updated = 0;
+    (remote || []).forEach((r) => {
+      if (!r || !r.id) return;
+      const ex = byId.get(r.id);
+      if (!ex) { byId.set(r.id, r); added++; }
+      else if ((r.updatedAt || "") > (ex.updatedAt || "")) { byId.set(r.id, r); updated++; }
+    });
+    return { merged: [...byId.values()], added, updated };
+  }
+
+  function updateSyncUI() {
+    const connected = !!(window.GDriveSync && GDriveSync.isConnected());
+    els.connectDriveBtn.hidden = connected;
+    els.syncConnected.hidden = !connected;
+  }
+
+  // Status indicator: green = synced, yellow = pending, red = error.
+  function onSyncStatus(state, detail) {
+    const states = {
+      synced:       { dot: "synced",  text: detail || "Synced" },
+      pending:      { dot: "pending", text: detail || "Syncing…" },
+      error:        { dot: "error",   text: detail || "Sync error" },
+      disconnected: { dot: "",        text: "" },
+    };
+    const view = states[state] || states.disconnected;
+    els.syncStatus.hidden = state === "disconnected";
+    els.syncDot.className = "sync-dot " + view.dot;
+    els.syncLabel.textContent = view.text;
+    updateSyncUI();
+  }
+
+  // Pull remote data, offer to merge it in, then push the result back
+  // so Drive holds the union. promptUser=false runs silently on resume.
+  async function pullMergePush(promptUser) {
+    let remote = null;
+    try {
+      remote = await GDriveSync.pull();
+    } catch (e) {
+      onSyncStatus("error", "Couldn't read Drive");
+      return;
+    }
+    if (remote && remote.length) {
+      const preview = mergeProperties(properties, remote);
+      const changes = preview.added + preview.updated;
+      const go = !promptUser || changes === 0 ||
+        confirm(
+          `Found ${remote.length} propert${remote.length === 1 ? "y" : "ies"} in Google Drive.\n` +
+          `Import ${preview.added} new and update ${preview.updated} existing on this device?`
+        );
+      if (go && changes > 0) {
+        properties = preview.merged;
+        save();           // persists locally + queues an upload
+        rebuildAll();
+      }
+    }
+    GDriveSync.syncNow();  // make sure Drive has the merged/local set
+  }
+
+  async function handleConnect() {
+    if (!GDriveSync.isConfigured()) { openSetup(); return; }
+    try {
+      await GDriveSync.connect();
+      updateSyncUI();
+      await pullMergePush(true);
+    } catch (e) {
+      if (e && e.message === "NOT_CONFIGURED") openSetup();
+      else if (e) onSyncStatus("error", "Connect failed");
+    }
+  }
+
+  function openSetup() {
+    els.clientIdInput.value = localStorage.getItem("gdrive_client_id") || "";
+    els.setupOverlay.hidden = false;
+    setTimeout(() => els.clientIdInput.focus(), 50);
+  }
+  function closeSetup() { els.setupOverlay.hidden = true; }
+
+  function wireSync() {
+    if (!window.GDriveSync) return;
+
+    GDriveSync.init({
+      onStatus: onSyncStatus,
+      getData: () => properties,
+    });
+
+    els.connectDriveBtn.onclick = handleConnect;
+    els.syncNowBtn.onclick = () => GDriveSync.syncNow();
+    els.disconnectDriveBtn.onclick = () => {
+      if (confirm("Disconnect Google Drive? Your pins stay on this device; they just stop syncing.")) {
+        GDriveSync.disconnect();
+        updateSyncUI();
+      }
+    };
+
+    // Setup modal
+    els.setupClose.onclick = closeSetup;
+    els.setupCancel.onclick = closeSetup;
+    els.setupOverlay.addEventListener("click", (e) => {
+      if (e.target === els.setupOverlay) closeSetup();
+    });
+    els.setupSave.onclick = async () => {
+      const id = els.clientIdInput.value.trim();
+      if (!id) { els.clientIdInput.focus(); return; }
+      GDriveSync.setClientId(id);
+      closeSetup();
+      await handleConnect();
+    };
+
+    updateSyncUI();
+
+    // Already connected from a previous session? Reconcile in the
+    // background once the auth library is ready (cross-device freshness).
+    if (GDriveSync.isConnected()) {
+      const resume = () => pullMergePush(false).catch(() => {});
+      if (GDriveSync.hasValidToken()) setTimeout(resume, 800);
+      else window.addEventListener("online", resume, { once: true });
+    }
+  }
+
   // ── Boot ────────────────────────────────────────────────────
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
 
   renderLegend();
   properties.forEach(addMarker);
   renderList();
+  wireSync();
 
   // Map initialised successfully — drop the "needs JavaScript" fallback.
   document.getElementById("mapFallback")?.remove();
