@@ -23,12 +23,8 @@
     (STATUSES.find((s) => s.name === status) || STATUSES[0]).color;
 
   // ── State ───────────────────────────────────────────────────
-  const _state = load();
   /** @type {Array<Object>} */
-  let properties = _state.properties;
-  /** @type {Array<{id:string, deletedAt:string}>} — deletion markers so
-      removals propagate across devices instead of resurrecting on merge. */
-  let tombstones = _state.tombstones;
+  let properties = load();
   const markers = new Map();   // id -> L.marker
   let pendingImages = [];       // base64 strings while editing
   let searchTerm = "";
@@ -56,48 +52,25 @@
     deleteBtn: $("deleteBtn"), cancelBtn: $("cancelBtn"),
     // lightbox
     lightbox: $("lightbox"), lightboxImg: $("lightboxImg"),
-    // google drive sync
-    connectDriveBtn: $("connectDriveBtn"),
-    syncConnected: $("syncConnected"),
-    syncNowBtn: $("syncNowBtn"),
-    disconnectDriveBtn: $("disconnectDriveBtn"),
-    syncStatus: $("syncStatus"), syncDot: $("syncDot"), syncLabel: $("syncLabel"),
-    // setup modal
-    setupOverlay: $("setupOverlay"), setupClose: $("setupClose"),
-    setupCancel: $("setupCancel"), setupSave: $("setupSave"), clientIdInput: $("clientIdInput"),
   };
 
   // ── Storage ─────────────────────────────────────────────────
-  // Normalize any stored/remote shape into { properties, tombstones }.
-  // Accepts the legacy bare-array format for backward compatibility.
-  function normalizeState(raw) {
-    if (Array.isArray(raw)) return { properties: raw, tombstones: [] };
-    if (raw && typeof raw === "object") {
-      return {
-        properties: Array.isArray(raw.properties) ? raw.properties : [],
-        tombstones: Array.isArray(raw.tombstones) ? raw.tombstones : [],
-      };
-    }
-    return { properties: [], tombstones: [] };
-  }
   function load() {
     try {
-      return normalizeState(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     } catch (e) {
       console.warn("Could not parse stored properties:", e);
-      return { properties: [], tombstones: [] };
+      return [];
     }
   }
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ properties, tombstones }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
     } catch (e) {
       alert(
         "Storage limit reached. Try removing some photos or older properties.\n\n" + e.message
       );
     }
-    // Back up to Google Drive when connected (debounced, offline-safe).
-    if (window.GDriveSync) GDriveSync.queueSync();
   }
 
   // ── Map setup ───────────────────────────────────────────────
@@ -262,21 +235,11 @@
   function removeProperty(id) {
     if (!confirm("Delete this property and its photos?")) return;
     properties = properties.filter((p) => p.id !== id);
-    recordTombstone(id);
     const m = markers.get(id);
     if (m) { map.removeLayer(m); markers.delete(id); }
     save();
     renderList();
     closeForm();
-  }
-
-  // Mark an id as deleted so other devices remove it too (instead of
-  // re-adding it on the next merge).
-  function recordTombstone(id) {
-    const now = new Date().toISOString();
-    const ex = tombstones.find((t) => t.id === id);
-    if (ex) ex.deletedAt = now;
-    else tombstones.push({ id, deletedAt: now });
   }
 
   // ── Sidebar list ────────────────────────────────────────────
@@ -427,189 +390,12 @@
     renderList();
   });
 
-  // ── Google Drive sync ───────────────────────────────────────
-  // Redraw every marker + the list after data changes wholesale
-  // (e.g. an import/merge from Drive).
-  function rebuildAll() {
-    markers.forEach((m) => map.removeLayer(m));
-    markers.clear();
-    properties.forEach(addMarker);
-    renderList();
-  }
-
-  // How long to keep tombstones before pruning (days). Long enough for
-  // every device to have synced and dropped the deleted record.
-  const TOMBSTONE_TTL_DAYS = 180;
-
-  // Merge two { properties, tombstones } states. Union by id with
-  // newest-wins on properties; deletions (tombstones) and edits race by
-  // timestamp, so a delete on one device removes the pin everywhere,
-  // while an edit made *after* a delete resurrects it.
-  // Returns the merged state plus { added, updated, removed } vs `local`.
-  function mergeState(local, remote) {
-    // 1. Union tombstones — newest deletedAt wins.
-    const tomb = new Map();
-    const addTomb = (t) => {
-      if (!t || !t.id) return;
-      const ex = tomb.get(t.id);
-      if (!ex || (t.deletedAt || "") > (ex.deletedAt || "")) {
-        tomb.set(t.id, { id: t.id, deletedAt: t.deletedAt || "" });
-      }
-    };
-    local.tombstones.forEach(addTomb);
-    remote.tombstones.forEach(addTomb);
-
-    // 2. Union properties — newest updatedAt wins.
-    const localById = new Map(local.properties.map((p) => [p.id, p]));
-    const props = new Map(localById);
-    remote.properties.forEach((r) => {
-      if (!r || !r.id) return;
-      const ex = props.get(r.id);
-      if (!ex || (r.updatedAt || "") > (ex.updatedAt || "")) props.set(r.id, r);
-    });
-
-    // 3. Apply tombstones. A pin edited after its deletion is resurrected
-    //    (and its tombstone dropped); otherwise the pin is removed.
-    tomb.forEach((t, id) => {
-      const p = props.get(id);
-      if (p && (p.updatedAt || "") > (t.deletedAt || "")) tomb.delete(id);
-      else if (p) props.delete(id);
-    });
-
-    // 4. Prune tombstones older than the TTL to bound file growth.
-    const cutoff = new Date(Date.now() - TOMBSTONE_TTL_DAYS * 864e5).toISOString();
-    const tombstonesOut = [...tomb.values()].filter((t) => (t.deletedAt || "") >= cutoff);
-
-    // 5. Tally changes relative to the local state, for the prompt.
-    let added = 0, updated = 0, removed = 0;
-    props.forEach((p, id) => {
-      if (!localById.has(id)) added++;
-      else if (p !== localById.get(id)) updated++;
-    });
-    localById.forEach((_, id) => { if (!props.has(id)) removed++; });
-
-    return { properties: [...props.values()], tombstones: tombstonesOut, added, updated, removed };
-  }
-
-  function updateSyncUI() {
-    const connected = !!(window.GDriveSync && GDriveSync.isConnected());
-    els.connectDriveBtn.hidden = connected;
-    els.syncConnected.hidden = !connected;
-  }
-
-  // Status indicator: green = synced, yellow = pending, red = error.
-  function onSyncStatus(state, detail) {
-    const states = {
-      synced:       { dot: "synced",  text: detail || "Synced" },
-      pending:      { dot: "pending", text: detail || "Syncing…" },
-      error:        { dot: "error",   text: detail || "Sync error" },
-      disconnected: { dot: "",        text: "" },
-    };
-    const view = states[state] || states.disconnected;
-    els.syncStatus.hidden = state === "disconnected";
-    els.syncDot.className = "sync-dot " + view.dot;
-    els.syncLabel.textContent = view.text;
-    updateSyncUI();
-  }
-
-  // Pull remote data, offer to merge it in, then push the result back
-  // so Drive holds the union. promptUser=false runs silently on resume.
-  async function pullMergePush(promptUser) {
-    let remoteRaw = null;
-    try {
-      remoteRaw = await GDriveSync.pull();
-    } catch (e) {
-      onSyncStatus("error", "Couldn't read Drive");
-      return;
-    }
-    const remote = normalizeState(remoteRaw);
-    if (remote.properties.length || remote.tombstones.length) {
-      const result = mergeState({ properties, tombstones }, remote);
-      const changes = result.added + result.updated + result.removed;
-      const go = !promptUser || changes === 0 ||
-        confirm(
-          "Google Drive has changes from another device.\n" +
-          `Import ${result.added} new, update ${result.updated}, ` +
-          `and remove ${result.removed} deleted elsewhere?`
-        );
-      if (go && changes > 0) {
-        properties = result.properties;
-        tombstones = result.tombstones;
-        save();           // persists locally + queues an upload
-        rebuildAll();
-      }
-    }
-    GDriveSync.syncNow();  // make sure Drive has the merged/local set
-  }
-
-  async function handleConnect() {
-    if (!GDriveSync.isConfigured()) { openSetup(); return; }
-    try {
-      await GDriveSync.connect();
-      updateSyncUI();
-      await pullMergePush(true);
-    } catch (e) {
-      if (e && e.message === "NOT_CONFIGURED") openSetup();
-      else if (e) onSyncStatus("error", "Connect failed");
-    }
-  }
-
-  function openSetup() {
-    els.clientIdInput.value = localStorage.getItem("gdrive_client_id") || "";
-    els.setupOverlay.hidden = false;
-    setTimeout(() => els.clientIdInput.focus(), 50);
-  }
-  function closeSetup() { els.setupOverlay.hidden = true; }
-
-  function wireSync() {
-    if (!window.GDriveSync) return;
-
-    GDriveSync.init({
-      onStatus: onSyncStatus,
-      getData: () => ({ properties, tombstones }),
-    });
-
-    els.connectDriveBtn.onclick = handleConnect;
-    els.syncNowBtn.onclick = () => GDriveSync.syncNow();
-    els.disconnectDriveBtn.onclick = () => {
-      if (confirm("Disconnect Google Drive? Your pins stay on this device; they just stop syncing.")) {
-        GDriveSync.disconnect();
-        updateSyncUI();
-      }
-    };
-
-    // Setup modal
-    els.setupClose.onclick = closeSetup;
-    els.setupCancel.onclick = closeSetup;
-    els.setupOverlay.addEventListener("click", (e) => {
-      if (e.target === els.setupOverlay) closeSetup();
-    });
-    els.setupSave.onclick = async () => {
-      const id = els.clientIdInput.value.trim();
-      if (!id) { els.clientIdInput.focus(); return; }
-      GDriveSync.setClientId(id);
-      closeSetup();
-      await handleConnect();
-    };
-
-    updateSyncUI();
-
-    // Already connected from a previous session? Reconcile in the
-    // background once the auth library is ready (cross-device freshness).
-    if (GDriveSync.isConnected()) {
-      const resume = () => pullMergePush(false).catch(() => {});
-      if (GDriveSync.hasValidToken()) setTimeout(resume, 800);
-      else window.addEventListener("online", resume, { once: true });
-    }
-  }
-
   // ── Boot ────────────────────────────────────────────────────
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
 
   renderLegend();
   properties.forEach(addMarker);
   renderList();
-  wireSync();
 
   // Map initialised successfully — drop the "needs JavaScript" fallback.
   document.getElementById("mapFallback")?.remove();

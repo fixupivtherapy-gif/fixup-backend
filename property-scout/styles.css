@@ -148,54 +148,6 @@ html, body {
 
 .empty-state { padding: 24px; color: var(--ink-soft); font-size: 14px; text-align: center; }
 
-/* ───────────── Google Drive sync (sidebar footer) ───────────── */
-.sidebar-foot {
-  border-top: 1px solid var(--line);
-  padding: 10px 12px;
-  background: var(--surface);
-}
-.btn-block { width: 100%; }
-.btn-sm { min-height: 36px; padding: 8px 10px; font-size: 13px; }
-.gdrive-mark { margin-right: 4px; }
-.sync-connected { display: flex; flex-direction: column; gap: 8px; }
-.sync-account { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
-.sync-account::before {
-  content: ""; width: 8px; height: 8px; border-radius: 50%;
-  background: var(--s-contract); display: inline-block;
-}
-.sync-connected-actions { display: flex; gap: 8px; }
-.sync-connected-actions .btn { flex: 1; }
-
-/* ───────────── Sync status indicator (map corner) ───────────── */
-.sync-status {
-  position: absolute;
-  bottom: 14px; right: 14px;
-  z-index: 600;
-  display: flex; align-items: center; gap: 7px;
-  background: rgba(255,255,255,.94);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 6px 12px 6px 10px;
-  font-size: 12px; font-weight: 600; color: var(--ink-soft);
-  box-shadow: var(--shadow);
-  max-width: 70vw;
-}
-.sync-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sync-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--s-passed); flex: 0 0 10px;
-}
-.sync-dot.synced  { background: #16a34a; }              /* green  */
-.sync-dot.pending { background: #d97706; animation: pulse 1.2s ease-in-out infinite; } /* yellow */
-.sync-dot.error   { background: #dc2626; }              /* red    */
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
-
-/* Keep the indicator clear of Leaflet's bottom-right attribution */
-.leaflet-bottom.leaflet-right { margin-bottom: 40px; }
-
-.setup-note { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin: 0 0 12px; }
-.setup-note a { color: var(--brand); }
-
 /* ───────────── Map ───────────── */
 .map-wrap { position: relative; flex: 1; }
 #map { position: absolute; inset: 0; background: #e8edf0; }
