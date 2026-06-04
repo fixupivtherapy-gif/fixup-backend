@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#0e7490" />
+  <title>PR Property Scout — Ponce</title>
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ───────────── Top bar ───────────── -->
+  <header class="topbar">
+    <button id="toggleSidebar" class="icon-btn" aria-label="Toggle property list" title="Toggle list">
+      <span class="hamburger"></span>
+    </button>
+    <div class="brand">
+      <span class="brand-mark">📍</span>
+      <span class="brand-text">PR Property Scout</span>
+      <span class="brand-sub">Ponce &amp; the South</span>
+    </div>
+    <div class="topbar-actions">
+      <span id="countBadge" class="count-badge" title="Saved properties">0</span>
+      <button id="exportBtn" class="btn btn-ghost" title="Download all properties as JSON">Export</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- ───────────── Sidebar ───────────── -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-head">
+        <input id="searchInput" type="search" class="search" placeholder="Search address or notes…" autocomplete="off" />
+      </div>
+      <div class="legend" id="legend"></div>
+      <ul id="propertyList" class="property-list"></ul>
+      <p id="emptyState" class="empty-state">
+        Tap anywhere on the map to drop your first pin.
+      </p>
+    </aside>
+
+    <!-- ───────────── Map ───────────── -->
+    <main class="map-wrap">
+      <div id="map"></div>
+      <div class="map-hint" id="mapHint">Tap the map to add a property</div>
+    </main>
+  </div>
+
+  <!-- ───────────── Edit / Add modal ───────────── -->
+  <div id="modalOverlay" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h2 id="modalTitle">New property</h2>
+        <button id="modalClose" class="icon-btn" aria-label="Close">&times;</button>
+      </div>
+
+      <form id="propertyForm" class="form">
+        <label class="field">
+          <span class="field-label">Address</span>
+          <input id="fAddress" type="text" placeholder="123 Calle Marina, Ponce, PR" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Deal status</span>
+          <select id="fStatus">
+            <option value="Interested">Interested</option>
+            <option value="Contacted">Contacted</option>
+            <option value="Offer Pending">Offer Pending</option>
+            <option value="Under Contract">Under Contract</option>
+            <option value="Passed">Passed</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Notes</span>
+          <textarea id="fNotes" rows="3" placeholder="Asking price, condition, owner contact, comps…"></textarea>
+        </label>
+
+        <div class="field">
+          <span class="field-label">Photos <small>(up to 3)</small></span>
+          <div id="imagePreview" class="image-preview"></div>
+          <label class="upload-btn" id="uploadLabel">
+            <input id="fImages" type="file" accept="image/*" multiple capture="environment" hidden />
+            <span>+ Add photos</span>
+          </label>
+        </div>
+
+        <input type="hidden" id="fId" />
+        <input type="hidden" id="fLat" />
+        <input type="hidden" id="fLng" />
+
+        <div class="modal-actions">
+          <button type="button" id="deleteBtn" class="btn btn-danger" hidden>Delete</button>
+          <div class="spacer"></div>
+          <button type="button" id="cancelBtn" class="btn btn-ghost">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ───────────── Lightbox ───────────── -->
+  <div id="lightbox" class="lightbox" hidden>
+    <button class="lightbox-close icon-btn" aria-label="Close">&times;</button>
+    <img id="lightboxImg" alt="Property photo" />
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="app.js"></script>
+</body>
+</html>
