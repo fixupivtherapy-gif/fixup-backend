@@ -40,7 +40,7 @@
     </div>
     <div class="topbar-actions">
       <span id="countBadge" class="count-badge" title="Saved properties">0</span>
-      <button id="installBtn" class="btn btn-ghost" title="Instalar la app" hidden>⬇️ Instalar</button>
+      <button id="installBtn" class="btn btn-ghost" title="Instalar la app">⬇️ Instalar</button>
       <button id="importBtn" class="btn btn-ghost" title="Import properties from a JSON file">Import</button>
       <button id="exportBtn" class="btn btn-ghost" title="Download all properties as JSON">Export</button>
       <input id="importFile" type="file" accept="application/json,.json" hidden />
@@ -79,6 +79,28 @@
   <div id="iosHint" class="ios-hint" hidden>
     <span>Para instalar: toca <strong>Compartir&nbsp;⬆️</strong> &rarr; <strong>Añadir a pantalla de inicio</strong>.</span>
     <button id="iosHintClose" class="ios-hint-close" aria-label="Cerrar">&times;</button>
+  </div>
+
+  <!-- Install instructions modal (shown by the Instalar button) -->
+  <div id="installOverlay" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="installTitle">
+      <div class="modal-head">
+        <h2 id="installTitle">Instalar PR Property Scout</h2>
+        <button id="installClose" class="icon-btn" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="form">
+        <div id="installSteps" class="install-steps"></div>
+        <p class="install-note">
+          Instálala en <strong>cada dispositivo</strong> abriendo este mismo
+          enlace. Para llevar tus propiedades de un equipo a otro, usa
+          <strong>Export</strong> y luego <strong>Import</strong>.
+        </p>
+        <div class="modal-actions">
+          <div class="spacer"></div>
+          <button type="button" id="installOk" class="btn btn-primary">Entendido</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ───────────── Edit / Add modal ───────────── -->

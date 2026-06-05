@@ -58,6 +58,8 @@
     installBtn: $("installBtn"),
     iosHint: $("iosHint"), iosHintClose: $("iosHintClose"),
     offlineHint: $("offlineHint"),
+    installOverlay: $("installOverlay"), installClose: $("installClose"),
+    installOk: $("installOk"), installSteps: $("installSteps"),
   };
 
   // ── Storage ─────────────────────────────────────────────────
@@ -574,33 +576,79 @@
         .catch((e) => console.warn("Service worker registration failed:", e));
     }
 
-    // Install button — Chrome / Edge / Android fire beforeinstallprompt.
+    // Platform detection.
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); // iPadOS
+    const isAndroid = /android/i.test(navigator.userAgent);
+    const standalone = window.navigator.standalone === true ||
+      window.matchMedia("(display-mode: standalone)").matches;
+
+    // Platform-specific, step-by-step install instructions (shown when the
+    // browser can't pop a native install prompt — e.g. iOS Safari always).
+    function installStepsHTML() {
+      if (isIOS) {
+        return '<ol>' +
+          '<li>Toca el botón <strong>Compartir ⬆️</strong> (abajo o arriba en Safari).</li>' +
+          '<li>Desliza y toca <strong>Añadir a pantalla de inicio</strong>.</li>' +
+          '<li>Toca <strong>Añadir</strong> — el ícono JD queda en tu pantalla.</li>' +
+          '</ol>' +
+          '<p class="install-note">En iPhone/iPad la instalación se hace desde <strong>Safari</strong> (Chrome no la permite).</p>';
+      }
+      if (isAndroid) {
+        return '<ol>' +
+          '<li>Si aparece, toca <strong>Instalar</strong> en el aviso de Chrome.</li>' +
+          '<li>O abre el menú <strong>⋮</strong> &rarr; <strong>Instalar app</strong> (o <strong>Añadir a pantalla de inicio</strong>).</li>' +
+          '<li>Confirma — el ícono JD aparece en tu pantalla de inicio.</li>' +
+          '</ol>';
+      }
+      return '<ol>' +
+        '<li>En <strong>Chrome</strong> o <strong>Edge</strong>, haz clic en el ícono <strong>Instalar ⬇️</strong> al final de la barra de direcciones.</li>' +
+        '<li>O abre el menú <strong>⋮</strong> &rarr; <strong>Instalar PR Property Scout…</strong></li>' +
+        '<li>Se abre en su propia ventana, con ícono propio.</li>' +
+        '</ol>';
+    }
+    function openInstallHelp() {
+      if (!els.installOverlay) return;
+      if (els.installSteps) els.installSteps.innerHTML = installStepsHTML();
+      els.installOverlay.hidden = false;
+    }
+    function closeInstallHelp() { if (els.installOverlay) els.installOverlay.hidden = true; }
+    if (els.installClose) els.installClose.onclick = closeInstallHelp;
+    if (els.installOk) els.installOk.onclick = closeInstallHelp;
+    if (els.installOverlay) {
+      els.installOverlay.addEventListener("click", (e) => {
+        if (e.target === els.installOverlay) closeInstallHelp();
+      });
+    }
+
+    // Capture the native install prompt where supported (Chrome/Edge/Android).
     let deferredPrompt = null;
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      if (els.installBtn) els.installBtn.hidden = false;
     });
+
+    // The Instalar button is always available (unless already installed):
+    // it fires the native prompt when possible, otherwise shows the steps.
     if (els.installBtn) {
+      els.installBtn.hidden = standalone; // no point if already installed
       els.installBtn.onclick = async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        try { await deferredPrompt.userChoice; } catch (e) { /* noop */ }
-        deferredPrompt = null;
-        els.installBtn.hidden = true;
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          try { await deferredPrompt.userChoice; } catch (e) { /* noop */ }
+          deferredPrompt = null;
+          return;
+        }
+        openInstallHelp();
       };
     }
     window.addEventListener("appinstalled", () => {
       deferredPrompt = null;
       if (els.installBtn) els.installBtn.hidden = true;
+      closeInstallHelp();
     });
 
-    // iOS Safari doesn't fire beforeinstallprompt — show a one-time,
-    // dismissible "Add to Home Screen" hint instead.
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); // iPadOS
-    const standalone = window.navigator.standalone === true ||
-      window.matchMedia("(display-mode: standalone)").matches;
+    // First-run nudge on iOS (where there's no install button in the browser).
     let hintDismissed = false;
     try { hintDismissed = localStorage.getItem("pwa_ios_hint") === "1"; } catch (e) { /* noop */ }
     if (isIOS && !standalone && !hintDismissed && els.iosHint) {
