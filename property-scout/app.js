@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────────
    PR Property Scout — Leaflet + localStorage, no backend.
    ───────────────────────────────────────────────────────────── */
-(function () {
+(async function () {
   "use strict";
 
   // ── Config ──────────────────────────────────────────────────
@@ -24,8 +24,8 @@
     (STATUSES.find((s) => s.name === status) || STATUSES[0]).color;
 
   // ── State ───────────────────────────────────────────────────
-  /** @type {Array<Object>} */
-  let properties = load();
+  /** @type {Array<Object>} — hydrated from storage during boot (async). */
+  let properties = [];
   const markers = new Map();   // id -> L.marker
   let pendingImages = [];       // base64 strings while editing
   let searchTerm = "";
@@ -54,10 +54,52 @@
     deleteBtn: $("deleteBtn"), cancelBtn: $("cancelBtn"),
     // lightbox
     lightbox: $("lightbox"), lightboxImg: $("lightboxImg"),
+    // pwa
+    installBtn: $("installBtn"),
+    iosHint: $("iosHint"), iosHintClose: $("iosHintClose"),
+    offlineHint: $("offlineHint"),
   };
 
   // ── Storage ─────────────────────────────────────────────────
-  function load() {
+  // Durable persistence via IndexedDB (iOS evicts localStorage after ~7
+  // days of non-use, and base64 photos hit the localStorage cap fast).
+  // Falls back to localStorage if IndexedDB is unavailable, and migrates
+  // any existing localStorage data on first run. Export-to-JSON remains
+  // the manual backup either way.
+  const IDB_NAME = "pr_property_scout";
+  const IDB_STORE = "kv";
+  const IDB_KEY = "properties";
+  let idbAvailable = (typeof indexedDB !== "undefined");
+  let idbPromise = null;
+
+  function openIDB() {
+    if (!idbPromise) {
+      idbPromise = new Promise((resolve, reject) => {
+        const req = indexedDB.open(IDB_NAME, 1);
+        req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+    return idbPromise;
+  }
+  function idbGet(key) {
+    return openIDB().then((db) => new Promise((resolve, reject) => {
+      const r = db.transaction(IDB_STORE, "readonly").objectStore(IDB_STORE).get(key);
+      r.onsuccess = () => resolve(r.result);
+      r.onerror = () => reject(r.error);
+    }));
+  }
+  function idbPut(key, val) {
+    return openIDB().then((db) => new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      tx.objectStore(IDB_STORE).put(val, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    }));
+  }
+
+  function loadLocal() {
     try {
       return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     } catch (e) {
@@ -65,13 +107,44 @@
       return [];
     }
   }
-  function save() {
+
+  // Read once at startup. Prefer IndexedDB; if empty, migrate any legacy
+  // localStorage data into it.
+  async function loadData() {
+    if (idbAvailable) {
+      try {
+        const v = await idbGet(IDB_KEY);
+        if (Array.isArray(v)) return v;
+        const legacy = loadLocal();            // one-time migration
+        if (legacy.length) { try { await idbPut(IDB_KEY, legacy); } catch (e) { /* noop */ } }
+        return legacy;
+      } catch (e) {
+        console.warn("IndexedDB unavailable, using localStorage:", e);
+        idbAvailable = false;
+      }
+    }
+    return loadLocal();
+  }
+
+  function saveLocal() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
     } catch (e) {
       alert(
-        "Storage limit reached. Try removing some photos or older properties.\n\n" + e.message
+        "Storage limit reached. Try removing some photos or older properties, " +
+        "or use Export to back up.\n\n" + e.message
       );
+    }
+  }
+  function save() {
+    if (idbAvailable) {
+      idbPut(IDB_KEY, properties).catch((e) => {
+        console.warn("IndexedDB write failed, falling back to localStorage:", e);
+        idbAvailable = false;
+        saveLocal();
+      });
+    } else {
+      saveLocal();
     }
   }
 
@@ -493,13 +566,71 @@
     toggleLabels();
   }
 
+  // ── PWA: service worker, install prompt, offline hint ───────
+  function initPWA() {
+    // Register the service worker (HTTPS / localhost only; never file://).
+    if ("serviceWorker" in navigator && window.isSecureContext) {
+      navigator.serviceWorker.register("./service-worker.js")
+        .catch((e) => console.warn("Service worker registration failed:", e));
+    }
+
+    // Install button — Chrome / Edge / Android fire beforeinstallprompt.
+    let deferredPrompt = null;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (els.installBtn) els.installBtn.hidden = false;
+    });
+    if (els.installBtn) {
+      els.installBtn.onclick = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        try { await deferredPrompt.userChoice; } catch (e) { /* noop */ }
+        deferredPrompt = null;
+        els.installBtn.hidden = true;
+      };
+    }
+    window.addEventListener("appinstalled", () => {
+      deferredPrompt = null;
+      if (els.installBtn) els.installBtn.hidden = true;
+    });
+
+    // iOS Safari doesn't fire beforeinstallprompt — show a one-time,
+    // dismissible "Add to Home Screen" hint instead.
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); // iPadOS
+    const standalone = window.navigator.standalone === true ||
+      window.matchMedia("(display-mode: standalone)").matches;
+    let hintDismissed = false;
+    try { hintDismissed = localStorage.getItem("pwa_ios_hint") === "1"; } catch (e) { /* noop */ }
+    if (isIOS && !standalone && !hintDismissed && els.iosHint) {
+      els.iosHint.hidden = false;
+      if (els.iosHintClose) {
+        els.iosHintClose.onclick = () => {
+          els.iosHint.hidden = true;
+          try { localStorage.setItem("pwa_ios_hint", "1"); } catch (e) { /* noop */ }
+        };
+      }
+    }
+
+    // Offline indicator over the map.
+    const updateOnline = () => {
+      if (els.offlineHint) els.offlineHint.hidden = navigator.onLine;
+    };
+    window.addEventListener("online", updateOnline);
+    window.addEventListener("offline", updateOnline);
+    updateOnline();
+  }
+
   // ── Boot ────────────────────────────────────────────────────
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
 
+  properties = await loadData();   // hydrate from IndexedDB / localStorage
   renderLegend();
   addMunicipios();
   properties.forEach(addMarker);
   renderList();
+  initPWA();
 
   // Map initialised successfully — drop the "needs JavaScript" fallback.
   document.getElementById("mapFallback")?.remove();

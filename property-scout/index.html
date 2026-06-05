@@ -2,9 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0e7490" />
+  <meta name="description" content="Scout real-estate deals across Puerto Rico — drop pins, track deal status, notes & photos. Works offline." />
   <title>PR Property Scout — Puerto Rico</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+
+  <!-- iOS / Safari add-to-home-screen support -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PR Scout" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
   <!-- Leaflet CSS -->
   <link
@@ -28,6 +40,7 @@
     </div>
     <div class="topbar-actions">
       <span id="countBadge" class="count-badge" title="Saved properties">0</span>
+      <button id="installBtn" class="btn btn-ghost" title="Instalar la app" hidden>⬇️ Instalar</button>
       <button id="importBtn" class="btn btn-ghost" title="Import properties from a JSON file">Import</button>
       <button id="exportBtn" class="btn btn-ghost" title="Download all properties as JSON">Export</button>
       <input id="importFile" type="file" accept="application/json,.json" hidden />
@@ -58,7 +71,14 @@
         </div>
       </div>
       <div class="map-hint" id="mapHint">Tap the map to add a property</div>
+      <div class="offline-hint" id="offlineHint" hidden>Sin conexión — viendo solo áreas guardadas</div>
     </main>
+  </div>
+
+  <!-- iOS install hint (Safari doesn't fire beforeinstallprompt) -->
+  <div id="iosHint" class="ios-hint" hidden>
+    <span>Para instalar: toca <strong>Compartir&nbsp;⬆️</strong> &rarr; <strong>Añadir a pantalla de inicio</strong>.</span>
+    <button id="iosHintClose" class="ios-hint-close" aria-label="Cerrar">&times;</button>
   </div>
 
   <!-- ───────────── Edit / Add modal ───────────── -->

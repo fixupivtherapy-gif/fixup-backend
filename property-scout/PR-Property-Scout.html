@@ -2,9 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0e7490" />
+  <meta name="description" content="Scout real-estate deals across Puerto Rico — drop pins, track deal status, notes & photos. Works offline." />
   <title>PR Property Scout — Puerto Rico</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+
+  <!-- iOS / Safari add-to-home-screen support -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PR Scout" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
   <!-- Leaflet CSS -->
   <link
@@ -52,11 +64,14 @@ html, body {
 
 /* ───────────── Top bar ───────────── */
 .topbar {
-  height: var(--header-h);
+  height: calc(var(--header-h) + env(safe-area-inset-top, 0px));
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 12px;
+  /* Respect the notch / safe areas when installed full-screen on iOS */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: max(12px, env(safe-area-inset-left, 0px));
+  padding-right: max(12px, env(safe-area-inset-right, 0px));
   background: var(--brand);
   color: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,.12);
@@ -74,7 +89,11 @@ html, body {
 /* Compact, tidy top bar on phones so the title never collides with the
    Import / Export buttons. */
 @media (max-width: 600px) {
-  .topbar { gap: 8px; padding: 0 10px; }
+  .topbar {
+    gap: 8px;
+    padding-left: max(8px, env(safe-area-inset-left, 0px));
+    padding-right: max(8px, env(safe-area-inset-right, 0px));
+  }
   .topbar-actions { gap: 6px; }
   .topbar-actions .btn {
     padding: 8px 14px;
@@ -99,7 +118,7 @@ html, body {
 /* ───────────── Layout ───────────── */
 .layout {
   display: flex;
-  height: calc(100% - var(--header-h));
+  height: calc(100% - var(--header-h) - env(safe-area-inset-top, 0px));
   position: relative;
 }
 .sidebar {
@@ -334,6 +353,44 @@ html, body {
 .lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
 .lightbox-close { position: absolute; top: 12px; right: 12px; color: #fff; font-size: 32px; }
 
+/* ───────────── PWA: offline hint + iOS install banner ───────────── */
+.offline-hint {
+  position: absolute;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  left: 50%; transform: translateX(-50%);
+  background: rgba(220, 38, 38, .94); color: #fff;
+  padding: 7px 14px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+  max-width: 92%; overflow: hidden; text-overflow: ellipsis;
+  z-index: 650; box-shadow: var(--shadow); pointer-events: none;
+}
+
+.ios-hint {
+  position: fixed; z-index: 2500;
+  left: 12px; right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink); color: #fff;
+  padding: 13px 42px 13px 15px; border-radius: 12px;
+  font-size: 13px; line-height: 1.45;
+  box-shadow: var(--shadow);
+  animation: slideUp .25s ease;
+}
+.ios-hint strong { color: #fff; font-weight: 700; }
+.ios-hint-close {
+  position: absolute; top: 6px; right: 8px;
+  background: transparent; border: 0; color: #fff;
+  font-size: 24px; line-height: 1; cursor: pointer;
+  width: 34px; height: 34px;
+}
+@media (min-width: 640px) {
+  .ios-hint { left: auto; right: 16px; max-width: 360px; }
+}
+
+/* Keep the bottom action bar of the modal clear of the home indicator */
+@media (max-width: 639px) {
+  .modal { padding-bottom: env(safe-area-inset-bottom, 0px); }
+}
+
 [hidden] { display: none !important; }
 
   </style>
@@ -351,6 +408,7 @@ html, body {
     </div>
     <div class="topbar-actions">
       <span id="countBadge" class="count-badge" title="Saved properties">0</span>
+      <button id="installBtn" class="btn btn-ghost" title="Instalar la app" hidden>⬇️ Instalar</button>
       <button id="importBtn" class="btn btn-ghost" title="Import properties from a JSON file">Import</button>
       <button id="exportBtn" class="btn btn-ghost" title="Download all properties as JSON">Export</button>
       <input id="importFile" type="file" accept="application/json,.json" hidden />
@@ -381,7 +439,14 @@ html, body {
         </div>
       </div>
       <div class="map-hint" id="mapHint">Tap the map to add a property</div>
+      <div class="offline-hint" id="offlineHint" hidden>Sin conexión — viendo solo áreas guardadas</div>
     </main>
+  </div>
+
+  <!-- iOS install hint (Safari doesn't fire beforeinstallprompt) -->
+  <div id="iosHint" class="ios-hint" hidden>
+    <span>Para instalar: toca <strong>Compartir&nbsp;⬆️</strong> &rarr; <strong>Añadir a pantalla de inicio</strong>.</span>
+    <button id="iosHintClose" class="ios-hint-close" aria-label="Cerrar">&times;</button>
   </div>
 
   <!-- ───────────── Edit / Add modal ───────────── -->
@@ -453,7 +518,7 @@ html, body {
 /* ─────────────────────────────────────────────────────────────
    PR Property Scout — Leaflet + localStorage, no backend.
    ───────────────────────────────────────────────────────────── */
-(function () {
+(async function () {
   "use strict";
 
   // ── Config ──────────────────────────────────────────────────
@@ -476,8 +541,8 @@ html, body {
     (STATUSES.find((s) => s.name === status) || STATUSES[0]).color;
 
   // ── State ───────────────────────────────────────────────────
-  /** @type {Array<Object>} */
-  let properties = load();
+  /** @type {Array<Object>} — hydrated from storage during boot (async). */
+  let properties = [];
   const markers = new Map();   // id -> L.marker
   let pendingImages = [];       // base64 strings while editing
   let searchTerm = "";
@@ -506,10 +571,52 @@ html, body {
     deleteBtn: $("deleteBtn"), cancelBtn: $("cancelBtn"),
     // lightbox
     lightbox: $("lightbox"), lightboxImg: $("lightboxImg"),
+    // pwa
+    installBtn: $("installBtn"),
+    iosHint: $("iosHint"), iosHintClose: $("iosHintClose"),
+    offlineHint: $("offlineHint"),
   };
 
   // ── Storage ─────────────────────────────────────────────────
-  function load() {
+  // Durable persistence via IndexedDB (iOS evicts localStorage after ~7
+  // days of non-use, and base64 photos hit the localStorage cap fast).
+  // Falls back to localStorage if IndexedDB is unavailable, and migrates
+  // any existing localStorage data on first run. Export-to-JSON remains
+  // the manual backup either way.
+  const IDB_NAME = "pr_property_scout";
+  const IDB_STORE = "kv";
+  const IDB_KEY = "properties";
+  let idbAvailable = (typeof indexedDB !== "undefined");
+  let idbPromise = null;
+
+  function openIDB() {
+    if (!idbPromise) {
+      idbPromise = new Promise((resolve, reject) => {
+        const req = indexedDB.open(IDB_NAME, 1);
+        req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+    return idbPromise;
+  }
+  function idbGet(key) {
+    return openIDB().then((db) => new Promise((resolve, reject) => {
+      const r = db.transaction(IDB_STORE, "readonly").objectStore(IDB_STORE).get(key);
+      r.onsuccess = () => resolve(r.result);
+      r.onerror = () => reject(r.error);
+    }));
+  }
+  function idbPut(key, val) {
+    return openIDB().then((db) => new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      tx.objectStore(IDB_STORE).put(val, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    }));
+  }
+
+  function loadLocal() {
     try {
       return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     } catch (e) {
@@ -517,13 +624,44 @@ html, body {
       return [];
     }
   }
-  function save() {
+
+  // Read once at startup. Prefer IndexedDB; if empty, migrate any legacy
+  // localStorage data into it.
+  async function loadData() {
+    if (idbAvailable) {
+      try {
+        const v = await idbGet(IDB_KEY);
+        if (Array.isArray(v)) return v;
+        const legacy = loadLocal();            // one-time migration
+        if (legacy.length) { try { await idbPut(IDB_KEY, legacy); } catch (e) { /* noop */ } }
+        return legacy;
+      } catch (e) {
+        console.warn("IndexedDB unavailable, using localStorage:", e);
+        idbAvailable = false;
+      }
+    }
+    return loadLocal();
+  }
+
+  function saveLocal() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
     } catch (e) {
       alert(
-        "Storage limit reached. Try removing some photos or older properties.\n\n" + e.message
+        "Storage limit reached. Try removing some photos or older properties, " +
+        "or use Export to back up.\n\n" + e.message
       );
+    }
+  }
+  function save() {
+    if (idbAvailable) {
+      idbPut(IDB_KEY, properties).catch((e) => {
+        console.warn("IndexedDB write failed, falling back to localStorage:", e);
+        idbAvailable = false;
+        saveLocal();
+      });
+    } else {
+      saveLocal();
     }
   }
 
@@ -945,13 +1083,71 @@ html, body {
     toggleLabels();
   }
 
+  // ── PWA: service worker, install prompt, offline hint ───────
+  function initPWA() {
+    // Register the service worker (HTTPS / localhost only; never file://).
+    if ("serviceWorker" in navigator && window.isSecureContext) {
+      navigator.serviceWorker.register("./service-worker.js")
+        .catch((e) => console.warn("Service worker registration failed:", e));
+    }
+
+    // Install button — Chrome / Edge / Android fire beforeinstallprompt.
+    let deferredPrompt = null;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (els.installBtn) els.installBtn.hidden = false;
+    });
+    if (els.installBtn) {
+      els.installBtn.onclick = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        try { await deferredPrompt.userChoice; } catch (e) { /* noop */ }
+        deferredPrompt = null;
+        els.installBtn.hidden = true;
+      };
+    }
+    window.addEventListener("appinstalled", () => {
+      deferredPrompt = null;
+      if (els.installBtn) els.installBtn.hidden = true;
+    });
+
+    // iOS Safari doesn't fire beforeinstallprompt — show a one-time,
+    // dismissible "Add to Home Screen" hint instead.
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); // iPadOS
+    const standalone = window.navigator.standalone === true ||
+      window.matchMedia("(display-mode: standalone)").matches;
+    let hintDismissed = false;
+    try { hintDismissed = localStorage.getItem("pwa_ios_hint") === "1"; } catch (e) { /* noop */ }
+    if (isIOS && !standalone && !hintDismissed && els.iosHint) {
+      els.iosHint.hidden = false;
+      if (els.iosHintClose) {
+        els.iosHintClose.onclick = () => {
+          els.iosHint.hidden = true;
+          try { localStorage.setItem("pwa_ios_hint", "1"); } catch (e) { /* noop */ }
+        };
+      }
+    }
+
+    // Offline indicator over the map.
+    const updateOnline = () => {
+      if (els.offlineHint) els.offlineHint.hidden = navigator.onLine;
+    };
+    window.addEventListener("online", updateOnline);
+    window.addEventListener("offline", updateOnline);
+    updateOnline();
+  }
+
   // ── Boot ────────────────────────────────────────────────────
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
 
+  properties = await loadData();   // hydrate from IndexedDB / localStorage
   renderLegend();
   addMunicipios();
   properties.forEach(addMarker);
   renderList();
+  initPWA();
 
   // Map initialised successfully — drop the "needs JavaScript" fallback.
   document.getElementById("mapFallback")?.remove();

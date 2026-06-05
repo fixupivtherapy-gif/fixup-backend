@@ -36,11 +36,14 @@ html, body {
 
 /* ───────────── Top bar ───────────── */
 .topbar {
-  height: var(--header-h);
+  height: calc(var(--header-h) + env(safe-area-inset-top, 0px));
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 12px;
+  /* Respect the notch / safe areas when installed full-screen on iOS */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: max(12px, env(safe-area-inset-left, 0px));
+  padding-right: max(12px, env(safe-area-inset-right, 0px));
   background: var(--brand);
   color: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,.12);
@@ -58,7 +61,11 @@ html, body {
 /* Compact, tidy top bar on phones so the title never collides with the
    Import / Export buttons. */
 @media (max-width: 600px) {
-  .topbar { gap: 8px; padding: 0 10px; }
+  .topbar {
+    gap: 8px;
+    padding-left: max(8px, env(safe-area-inset-left, 0px));
+    padding-right: max(8px, env(safe-area-inset-right, 0px));
+  }
   .topbar-actions { gap: 6px; }
   .topbar-actions .btn {
     padding: 8px 14px;
@@ -83,7 +90,7 @@ html, body {
 /* ───────────── Layout ───────────── */
 .layout {
   display: flex;
-  height: calc(100% - var(--header-h));
+  height: calc(100% - var(--header-h) - env(safe-area-inset-top, 0px));
   position: relative;
 }
 .sidebar {
@@ -317,5 +324,43 @@ html, body {
 }
 .lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
 .lightbox-close { position: absolute; top: 12px; right: 12px; color: #fff; font-size: 32px; }
+
+/* ───────────── PWA: offline hint + iOS install banner ───────────── */
+.offline-hint {
+  position: absolute;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  left: 50%; transform: translateX(-50%);
+  background: rgba(220, 38, 38, .94); color: #fff;
+  padding: 7px 14px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+  max-width: 92%; overflow: hidden; text-overflow: ellipsis;
+  z-index: 650; box-shadow: var(--shadow); pointer-events: none;
+}
+
+.ios-hint {
+  position: fixed; z-index: 2500;
+  left: 12px; right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink); color: #fff;
+  padding: 13px 42px 13px 15px; border-radius: 12px;
+  font-size: 13px; line-height: 1.45;
+  box-shadow: var(--shadow);
+  animation: slideUp .25s ease;
+}
+.ios-hint strong { color: #fff; font-weight: 700; }
+.ios-hint-close {
+  position: absolute; top: 6px; right: 8px;
+  background: transparent; border: 0; color: #fff;
+  font-size: 24px; line-height: 1; cursor: pointer;
+  width: 34px; height: 34px;
+}
+@media (min-width: 640px) {
+  .ios-hint { left: auto; right: 16px; max-width: 360px; }
+}
+
+/* Keep the bottom action bar of the modal clear of the home indicator */
+@media (max-width: 639px) {
+  .modal { padding-bottom: env(safe-area-inset-bottom, 0px); }
+}
 
 [hidden] { display: none !important; }
