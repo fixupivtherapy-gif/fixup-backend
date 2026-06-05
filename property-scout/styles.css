@@ -196,6 +196,16 @@ html, body {
   background: #fff; border-radius: 50%;
 }
 
+/* Municipio name labels — text only, with a white halo for legibility */
+.leaflet-tooltip.muni-label {
+  background: transparent; border: 0; box-shadow: none;
+  padding: 0; margin: 0;
+  color: #4c1d95; font-weight: 700; font-size: 11px;
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff;
+  white-space: nowrap;
+}
+.leaflet-tooltip.muni-label::before { display: none; border: 0; }
+
 /* ───────────── Buttons ───────────── */
 .btn {
   border: none; cursor: pointer;
