@@ -47,13 +47,29 @@ html, body {
   position: relative;
   z-index: 1200;
 }
-.brand { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.brand { display: flex; align-items: baseline; gap: 8px; min-width: 0; flex: 1 1 auto; overflow: hidden; }
 .brand-mark { font-size: 20px; }
-.brand-text { font-weight: 700; font-size: 16px; white-space: nowrap; }
+.brand-text { font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .brand-sub  { font-size: 12px; opacity: .8; white-space: nowrap; }
 @media (max-width: 520px) { .brand-sub { display: none; } }
 
-.topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+
+/* Compact, tidy top bar on phones so the title never collides with the
+   Import / Export buttons. */
+@media (max-width: 600px) {
+  .topbar { gap: 8px; padding: 0 10px; }
+  .topbar-actions { gap: 6px; }
+  .topbar-actions .btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    min-height: 36px;
+    border-radius: 999px;
+  }
+  .brand-text { font-size: 15px; }
+  .brand-mark { font-size: 18px; }
+  .count-badge { display: none; }   /* count still shows in the sidebar */
+}
 .count-badge {
   background: rgba(255,255,255,.2);
   border-radius: 999px;
