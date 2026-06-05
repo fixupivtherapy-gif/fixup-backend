@@ -1,12 +1,13 @@
 # PR Property Scout 🗺️
 
-A single-page, **fully local** map app for scouting real-estate deals around
-**Ponce, Puerto Rico** and the southern municipalities. No server, no cloud —
-everything lives in your browser via `localStorage`.
+A single-page, **fully local** map app for scouting real-estate deals across
+**all of Puerto Rico** — the main island plus Vieques and Culebra. No server,
+no cloud — everything lives in your browser via `localStorage`.
 
 ## Features
 
-- **Map (Leaflet)** centered on Ponce (`18.011, -66.614`), default zoom 13.
+- **Map (Leaflet)** opens framed on the whole island of Puerto Rico, with
+  detailed street-level tiles everywhere (zoom in anywhere on the island).
 - **Tap to drop a pin** — each pin opens a form to capture property details.
 - **Per-property data:** address, deal status, notes, and up to **3 photos**.
 - **Deal statuses** with distinct marker colors:
@@ -16,7 +17,10 @@ everything lives in your browser via `localStorage`.
 - **Image compression** — photos are resized (max 1024px) and stored as
   JPEG base64 to keep the storage footprint small.
 - **Searchable sidebar** listing every property by address / notes.
-- **Export** all properties to a JSON file for backup.
+- **Export / Import** — download all properties as a JSON file, and import a
+  JSON exported from another device to merge it in (union by id, no
+  duplicates; the most recently edited copy wins). This is the simple,
+  offline way to move data between devices.
 - **Responsive & touch-friendly** — works on phones, tablets, and desktops.
 
 ## Running it

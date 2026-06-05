@@ -5,8 +5,9 @@
   "use strict";
 
   // ── Config ──────────────────────────────────────────────────
-  const PONCE = [18.011, -66.614];
-  const DEFAULT_ZOOM = 13;
+  // Whole-island view: main island + Vieques & Culebra. The map opens
+  // framed on all of Puerto Rico; tiles stay detailed down to the street.
+  const PR_BOUNDS = [[17.85, -67.30], [18.57, -65.20]];
   const STORAGE_KEY = "pr_property_scout_v1";
   const MAX_IMAGES = 3;
   const IMG_MAX_DIM = 1024;   // px — longest edge after compression
@@ -40,6 +41,7 @@
     legend: $("legend"),
     countBadge: $("countBadge"),
     exportBtn: $("exportBtn"),
+    importBtn: $("importBtn"), importFile: $("importFile"),
     mapHint: $("mapHint"),
     // modal
     overlay: $("modalOverlay"),
@@ -74,7 +76,7 @@
   }
 
   // ── Map setup ───────────────────────────────────────────────
-  const map = L.map("map", { zoomControl: true }).setView(PONCE, DEFAULT_ZOOM);
+  const map = L.map("map", { zoomControl: true, minZoom: 8 }).fitBounds(PR_BOUNDS);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "&copy; OpenStreetMap contributors",
@@ -314,6 +316,63 @@
     a.download = `pr-property-scout-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  });
+
+  // ── Import ──────────────────────────────────────────────────
+  // Load a JSON exported from another device and merge it in. Union by
+  // id (no duplicates); when the same property exists on both sides, the
+  // most recently edited copy wins.
+  function rebuildAll() {
+    markers.forEach((m) => map.removeLayer(m));
+    markers.clear();
+    properties.forEach(addMarker);
+    renderList();
+  }
+
+  function mergeImport(incoming) {
+    const byId = new Map(properties.map((p) => [p.id, p]));
+    let added = 0, updated = 0;
+    incoming.forEach((r) => {
+      if (!r || !r.id || typeof r.lat !== "number" || typeof r.lng !== "number") return;
+      const ex = byId.get(r.id);
+      if (!ex) { byId.set(r.id, r); added++; }
+      else if ((r.updatedAt || "") > (ex.updatedAt || "")) { byId.set(r.id, r); updated++; }
+    });
+    properties = [...byId.values()];
+    return { added, updated };
+  }
+
+  els.importBtn.addEventListener("click", () => els.importFile.click());
+  els.importFile.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        const list = Array.isArray(data) ? data : (data && data.properties);
+        if (!Array.isArray(list)) throw new Error("That file isn't a property export.");
+        const { added, updated } = mergeImport(list);
+        save();
+        rebuildAll();
+        alert(
+          added || updated
+            ? `Import complete: ${added} new, ${updated} updated.`
+            : "Nothing new to import — everything was already here."
+        );
+      } catch (err) {
+        alert(
+          "Couldn't import that file. Pick a .json that was exported from this app.\n\n" +
+          err.message
+        );
+      }
+      els.importFile.value = ""; // allow re-importing the same file
+    };
+    reader.onerror = () => {
+      alert("Couldn't read the file.");
+      els.importFile.value = "";
+    };
+    reader.readAsText(file);
   });
 
   // ── Lightbox ────────────────────────────────────────────────
